@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simulado ENEM 2016–2023</title>
+  <style>
+:root {
+  --bg: #f4f1ea;
+  --paper: #fffdf8;
+  --ink: #1d2230;
+  --muted: #6b6f7b;
+  --line: #e4dfd3;
+  --accent: #23336b;
+  --accent-2: #c79a2b;
+  --ok: #2e7d4f;
+  --bad: #b23b3b;
+  --warn: #b7791f;
+  --shadow: 0 1px 2px rgba(20, 24, 40, .06), 0 8px 28px rgba(20, 24, 40, .08);
+  --radius: 14px;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+[data-theme="dark"] {
+  --bg: #12141b;
+  --paper: #1b1e28;
+  --ink: #e9e6de;
+  --muted: #9a9eab;
+  --line: #2c3040;
+  --accent: #8fa6ff;
+  --accent-2: #e0b84e;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 28px rgba(0, 0, 0, .35);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.5; min-height: 100vh; }
+button { font: inherit; cursor: pointer; }
+a { color: var(--accent); }
+h1, h2, h3 { font-family: var(--serif); font-weight: 600; letter-spacing: -.01em; margin: 0 0 .4em; }
+
+/* Topo */
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px clamp(14px, 3vw, 32px); background: var(--paper); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
+.brand { display: flex; gap: 12px; align-items: center; }
+.brand strong { font-family: var(--serif); font-size: 1.2rem; display: block; line-height: 1.1; }
+.brand small { color: var(--muted); }
+.brand-mark { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: var(--accent); color: var(--paper); font-family: var(--serif); font-weight: 700; font-size: 1.3rem; }
+.theme-toggle { border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 50%; width: 38px; height: 38px; font-size: 1.1rem; }
+
+/* Abas principais (12) */
+.tabs { display: flex; gap: 4px; overflow-x: auto; padding: 8px clamp(10px, 3vw, 32px) 0; background: var(--paper); border-bottom: 1px solid var(--line); position: sticky; top: 67px; z-index: 29; scrollbar-width: thin; }
+.tab { border: 0; background: transparent; color: var(--muted); padding: 10px 14px 12px; border-radius: 10px 10px 0 0; white-space: nowrap; position: relative; font-weight: 500; }
+.tab:hover { color: var(--ink); background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.tab.active { color: var(--accent); }
+.tab.active::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: 0; height: 3px; border-radius: 3px; background: var(--accent); }
+.tab .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-left: 6px; background: var(--line); vertical-align: middle; }
+.tab .dot.ready { background: var(--ok); }
+.tab .dot.missing { background: var(--warn); }
+
+.view { max-width: 1100px; margin: 0 auto; padding: clamp(16px, 3vw, 32px); }
+
+/* Cartões genéricos */
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: clamp(18px, 3vw, 28px); margin-bottom: 18px; }
+.hero { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 60%, #000)); color: #fff; border: 0; }
+.hero h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); }
+.hero p { opacity: .9; max-width: 60ch; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.muted { color: var(--muted); }
+.small { font-size: .88rem; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.spacer { flex: 1; }
+
+.btn { border: 1px solid var(--line); background: var(--paper); color: var(--ink); padding: 9px 16px; border-radius: 10px; font-weight: 500; transition: transform .1s, background .2s; }
+.btn:hover { background: color-mix(in srgb, var(--accent) 7%, var(--paper)); }
+.btn:active { transform: translateY(1px); }
+.btn.primary { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+.btn.primary:hover { background: color-mix(in srgb, var(--accent) 85%, #000); }
+.btn.gold { background: var(--accent-2); border-color: var(--accent-2); color: #1d1a10; }
+.btn.ghost { background: transparent; }
+.btn.danger { color: var(--bad); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.hero .btn { border-color: rgba(255,255,255,.4); }
+
+.pill { display: inline-flex; gap: 6px; align-items: center; font-size: .8rem; padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent); font-weight: 600; }
+.pill.ok { background: color-mix(in srgb, var(--ok) 14%, transparent); color: var(--ok); }
+.pill.warn { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
+.pill.bad { background: color-mix(in srgb, var(--bad) 14%, transparent); color: var(--bad); }
+
+.year-card h3 { font-size: 1.5rem; margin-bottom: 2px; }
+.year-card .theme { font-family: var(--serif); font-style: italic; color: var(--muted); font-size: .92rem; min-height: 3em; }
+
+.progress { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.progress > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .3s; }
+
+label.field { display: grid; gap: 4px; font-size: .9rem; }
+input[type=text], input[type=password], select, textarea { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; }
+
+/* Sub-abas Dia 1 / Dia 2 */
+.subtabs { display: inline-flex; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 4px; gap: 4px; margin-bottom: 18px; }
+.subtab { border: 0; background: transparent; color: var(--muted); padding: 8px 18px; border-radius: 9px; text-align: left; }
+.subtab small { display: block; font-size: .75rem; }
+.subtab.active { background: var(--accent); color: var(--paper); }
+.subtab.active small { opacity: .85; }
+
+/* Resumo de tópicos */
+.topics { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.topic { border: 1px solid var(--line); border-radius: 12px; padding: 16px; background: var(--bg); }
+.topic h3 { font-size: 1.05rem; }
+.topic ul { margin: 0; padding-left: 18px; }
+.topic li { margin: 3px 0; }
+.comp-list { display: grid; gap: 8px; }
+.comp { display: grid; grid-template-columns: 120px 1fr; gap: 10px; padding: 10px 12px; border-radius: 10px; background: var(--bg); border: 1px solid var(--line); }
+.comp b { color: var(--accent); }
+
+/* Prova */
+.exam-head { position: sticky; top: 118px; z-index: 20; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 14px; box-shadow: var(--shadow); margin-bottom: 16px; }
+.timer { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 1.15rem; padding: 4px 12px; border-radius: 9px; background: var(--bg); border: 1px solid var(--line); }
+.timer.low { color: var(--bad); border-color: var(--bad); }
+.exam-head .progress { flex: 1; min-width: 120px; }
+
+.book { perspective: 2200px; position: relative; }
+.page { background: var(--paper); border: 1px solid var(--line); border-radius: 6px 14px 14px 6px; box-shadow: var(--shadow), inset 10px 0 18px -12px rgba(0,0,0,.18); padding: clamp(20px, 4vw, 44px); min-height: 60vh; transform-origin: left center; backface-visibility: hidden; position: relative; }
+.page::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; border-radius: 6px 0 0 6px; background: var(--page-color, var(--accent)); }
+.page.turn-out-next { animation: outNext .38s ease-in forwards; }
+.page.turn-in-next { animation: inNext .42s ease-out; }
+.page.turn-out-prev { animation: outPrev .38s ease-in forwards; transform-origin: right center; }
+.page.turn-in-prev { animation: inPrev .42s ease-out; transform-origin: right center; }
+@keyframes outNext { to { transform: rotateY(-95deg); opacity: .2; } }
+@keyframes inNext { from { transform: rotateY(28deg) translateX(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes outPrev { to { transform: rotateY(95deg); opacity: .2; } }
+@keyframes inPrev { from { transform: rotateY(-28deg) translateX(-30px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .page { animation: none !important; } }
+
+.q-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.q-num { font-family: var(--serif); font-size: 1.6rem; font-weight: 700; }
+.q-text { font-family: var(--serif); font-size: 1.08rem; line-height: 1.7; }
+.q-text p { margin: 0 0 .9em; }
+.q-text img, .alt img { max-width: 100%; height: auto; display: block; margin: 12px auto; border-radius: 6px; background: #fff; }
+.q-text blockquote { margin: .6em 0; padding-left: 14px; border-left: 3px solid var(--line); color: var(--muted); }
+.q-intro { font-weight: 600; margin: 18px 0 10px; font-family: var(--serif); }
+.alts { display: grid; gap: 10px; margin-top: 10px; }
+.alt { display: grid; grid-template-columns: 38px 1fr; gap: 12px; align-items: start; text-align: left; width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); color: var(--ink); transition: border-color .15s, background .15s; }
+.alt:hover { border-color: var(--accent); }
+.alt .letter { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; border: 2px solid var(--line); font-weight: 700; }
+.alt.selected { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, var(--paper)); }
+.alt.selected .letter { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+.alt.struck .alt-body { text-decoration: line-through; opacity: .5; }
+.alt.correct { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 10%, var(--paper)); }
+.alt.correct .letter { background: var(--ok); border-color: var(--ok); color: #fff; }
+.alt.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 9%, var(--paper)); }
+.alt.wrong .letter { background: var(--bad); border-color: var(--bad); color: #fff; }
+.alt-body { font-family: var(--serif); font-size: 1.02rem; }
+.hint { font-size: .8rem; color: var(--muted); margin-top: 8px; }
+
+.pager { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 18px; }
+.pager .btn { min-width: 130px; }
+
+.qgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 6px; }
+.qgrid button { border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 8px; padding: 6px 0; font-size: .85rem; font-variant-numeric: tabular-nums; }
+.qgrid button.answered { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+.qgrid button.marked { box-shadow: inset 0 -3px 0 var(--accent-2); }
+.qgrid button.current { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+.qgrid button.ok { background: var(--ok); color: #fff; border-color: var(--ok); }
+.qgrid button.bad { background: var(--bad); color: #fff; border-color: var(--bad); }
+.qgrid-area { font-size: .8rem; font-weight: 600; color: var(--muted); margin: 10px 0 6px; }
+
+/* Redação */
+.essay-wrap { display: grid; grid-template-columns: 44px 1fr; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--bg); }
+.essay-lines { font-family: var(--serif); font-size: 1rem; line-height: 32px; color: var(--muted); text-align: right; padding: 10px 8px 10px 0; border-right: 1px solid var(--line); user-select: none; white-space: pre; overflow: hidden; }
+.essay { font-family: var(--serif); font-size: 1rem; line-height: 32px; border: 0 !important; border-radius: 0 !important; resize: vertical; min-height: calc(32px * 30 + 20px); padding: 10px 14px !important; background: repeating-linear-gradient(transparent 0 31px, var(--line) 31px 32px) !important; background-position: 0 10px !important; outline: none; width: 100%; }
+.essay-title { width: 100%; font-family: var(--serif); font-size: 1.05rem; margin-bottom: 10px; }
+
+.score-total { font-family: var(--serif); font-size: clamp(2.4rem, 7vw, 3.6rem); font-weight: 700; color: var(--accent); line-height: 1; }
+.comp-score { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; background: var(--bg); margin-bottom: 10px; }
+.comp-score .bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; margin: 8px 0; }
+.comp-score .bar i { display: block; height: 100%; background: var(--accent-2); }
+.comp-score h4 { margin: 0; display: flex; justify-content: space-between; gap: 10px; font-family: var(--serif); }
+
+/* Resultados */
+.area-results { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.area-res { border-radius: 12px; padding: 16px; background: var(--bg); border: 1px solid var(--line); border-top: 4px solid var(--c, var(--accent)); }
+.area-res .big { font-size: 2rem; font-weight: 700; font-family: var(--serif); }
+table.table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.table th, .table td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+.table th { color: var(--muted); font-weight: 600; font-size: .82rem; text-transform: uppercase; letter-spacing: .03em; }
+.table td.num { font-variant-numeric: tabular-nums; }
+
+.ai-box.md { white-space: normal; }
+.ai-box.md p { margin: 0 0 .7em; }
+.ai-box.md h4 { margin: .8em 0 .3em; font-family: var(--serif); }
+.ai-box { margin-top: 16px; padding: 16px; border-radius: 12px; border: 1px dashed var(--accent); background: color-mix(in srgb, var(--accent) 5%, var(--paper)); white-space: pre-wrap; font-size: .95rem; }
+
+/* Modal e toast */
+.modal { position: fixed; inset: 0; background: rgba(10, 12, 20, .55); display: grid; place-items: center; z-index: 100; padding: 16px; backdrop-filter: blur(3px); }
+.modal[hidden] { display: none; }
+.modal-card { background: var(--paper); border-radius: var(--radius); max-width: 760px; width: 100%; max-height: 88vh; overflow: auto; padding: 26px; position: relative; box-shadow: var(--shadow); }
+.modal-close { position: absolute; top: 10px; right: 12px; border: 0; background: transparent; font-size: 1.7rem; color: var(--muted); }
+.toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 10px 18px; border-radius: 10px; z-index: 120; box-shadow: var(--shadow); max-width: 90vw; }
+.toast[hidden] { display: none; }
+
+.spinner { width: 18px; height: 18px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; display: inline-block; animation: spin .8s linear infinite; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  .tabs { top: 63px; }
+  .exam-head { top: 112px; }
+  .comp { grid-template-columns: 1fr; }
+  .pager .btn { min-width: 0; flex: 1; }
+}
+@media print {
+  .topbar, .tabs, .exam-head, .pager { display: none !important; }
+}
+.externa { border: 1px dashed var(--warn); border-radius: 12px; padding: 16px 18px; background: color-mix(in srgb, var(--warn) 6%, var(--paper)); margin-bottom: 12px; }
+.externa .btn { text-decoration: none; display: inline-block; }
+
+.login { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 16px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #000)); }
+.login[hidden] { display: none; }
+.login-card { width: min(420px, 100%); margin: 0; }
+.login-card .subtabs { display: flex; }
+.login-card .subtab { flex: 1; text-align: center; }
+.login-card input { width: 100%; }
+
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">E</span>
+      <div>
+        <strong>Simulado ENEM</strong>
+        <small>8 edições · 2016 a 2023</small>
+      </div>
+    </div>
+    <div class="row"><div id="userBox" class="row"></div>
+    <button class="theme-toggle" id="themeToggle" title="Alternar tema claro/escuro" aria-label="Alternar tema">◐</button></div>
+  </header>
+
+  <nav class="tabs" id="tabs" role="tablist"></nav>
+
+  <main id="view" class="view"></main>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <button class="modal-close" id="modalClose" aria-label="Fechar">×</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+  <div class="login" id="login" hidden></div>
+
+  <script>
+/* Dados fixos do simulador: edições, temas de redação, áreas, tópicos e competências. */
+window.ENEM_DATA = {
+  YEARS: [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023],
+  API_COVERAGE_MAX: 2023,
+  EXAM_SECONDS: 6 * 60 * 60, // 6 horas por dia de prova
+
+  THEMES: {
+    2016: "Caminhos para combater a intolerância religiosa no Brasil",
+    2017: "Desafios para a formação educacional de surdos no Brasil",
+    2018: "Manipulação do comportamento do usuário pelo controle de dados na internet",
+    2019: "Democratização do acesso ao cinema no Brasil",
+    2020: "O estigma associado às doenças mentais na sociedade brasileira",
+    2021: "Invisibilidade e registro civil: garantia de acesso à cidadania no Brasil",
+    2022: "Desafios para a valorização de comunidades e povos tradicionais no Brasil",
+    2023: "Desafios para o enfrentamento da invisibilidade do trabalho de cuidado realizado pela mulher no Brasil"
+  },
+
+  AREAS: {
+    "linguagens":        { nome: "Linguagens, Códigos e suas Tecnologias", curto: "Linguagens", cor: "#7b4fb3", dia: 1 },
+    "ciencias-humanas":  { nome: "Ciências Humanas e suas Tecnologias",     curto: "Ciências Humanas", cor: "#b0603a", dia: 1 },
+    "ciencias-natureza": { nome: "Ciências da Natureza e suas Tecnologias", curto: "Ciências da Natureza", cor: "#2f7d5b", dia: 2 },
+    "matematica":        { nome: "Matemática e suas Tecnologias",           curto: "Matemática", cor: "#2c5aa0", dia: 2 }
+  },
+
+  DAYS: {
+    1: { titulo: "Dia 1", sub: "Linguagens · Ciências Humanas · Redação", areas: ["linguagens", "ciencias-humanas"], redacao: true },
+    2: { titulo: "Dia 2", sub: "Ciências da Natureza · Matemática", areas: ["ciencias-natureza", "matematica"], redacao: false }
+  },
+
+  TOPICS: {
+    "interpretacao": {
+      titulo: "Interpretação de texto (todas as áreas)",
+      itens: [
+        "Ler o comando da questão antes do texto-base e identificar o que exatamente se pede",
+        "Distinguir informação explícita, inferência e extrapolação indevida",
+        "Reconhecer a tese, os argumentos e a finalidade comunicativa do texto",
+        "Relacionar texto verbal e não verbal: gráficos, tabelas, charges, mapas e infográficos",
+        "Eliminar alternativas que generalizam, contradizem ou fogem do recorte do texto",
+        "Gerenciar o tempo: cerca de 3 minutos por questão, reservando tempo para a redação"
+      ]
+    },
+    "linguagens": {
+      titulo: "Linguagens, Códigos e suas Tecnologias",
+      itens: [
+        "Gêneros textuais e funções da linguagem",
+        "Variação linguística e preconceito linguístico",
+        "Figuras de linguagem, coesão e coerência",
+        "Literatura brasileira: escolas literárias, Modernismo e literatura contemporânea",
+        "Intertextualidade, paródia e paráfrase",
+        "Artes visuais, música, dança, teatro e patrimônio cultural",
+        "Educação Física: cultura corporal, esporte, saúde e corpo",
+        "Tecnologias da informação e comunicação",
+        "Língua estrangeira (Inglês ou Espanhol): leitura e compreensão global"
+      ]
+    },
+    "ciencias-humanas": {
+      titulo: "Ciências Humanas e suas Tecnologias",
+      itens: [
+        "História do Brasil: Colônia, Império, República, Era Vargas, Ditadura e redemocratização",
+        "História Geral: Antiguidade, Idade Média, Revoluções, Guerras Mundiais e Guerra Fria",
+        "Geografia física: clima, relevo, hidrografia, biomas e questões ambientais",
+        "Geografia humana: urbanização, população, agropecuária, indústria e globalização",
+        "Cartografia, escalas e leitura de mapas",
+        "Filosofia: pensamento antigo, moderno e contemporâneo; ética e política",
+        "Sociologia: trabalho, cultura, cidadania, movimentos sociais e desigualdade",
+        "Direitos humanos, povos indígenas, populações afro-brasileiras e diversidade"
+      ]
+    },
+    "ciencias-natureza": {
+      titulo: "Ciências da Natureza e suas Tecnologias",
+      itens: [
+        "Biologia: ecologia, genética, evolução, citologia, fisiologia humana, saúde e saneamento",
+        "Química: estequiometria, soluções, química orgânica, eletroquímica, termoquímica, equilíbrio e química ambiental",
+        "Física: mecânica, energia e suas transformações, eletricidade, ondulatória, óptica e termologia",
+        "Interpretação de experimentos, gráficos e dados científicos",
+        "Ciência, tecnologia e sociedade: impactos ambientais e energéticos"
+      ]
+    },
+    "matematica": {
+      titulo: "Matemática e suas Tecnologias",
+      itens: [
+        "Razão, proporção, regra de três e porcentagem",
+        "Estatística: média, mediana, moda, desvio e leitura de gráficos",
+        "Probabilidade e análise combinatória",
+        "Funções afim, quadrática, exponencial e logarítmica",
+        "Geometria plana e espacial: áreas, volumes e semelhança",
+        "Escalas, unidades de medida e conversões",
+        "Trigonometria, progressões e matemática financeira"
+      ]
+    },
+    "redacao": {
+      titulo: "Redação (texto dissertativo-argumentativo)",
+      itens: [
+        "Estrutura: introdução com tese, dois parágrafos de desenvolvimento e conclusão com proposta",
+        "Repertório sociocultural legitimado, pertinente e produtivo",
+        "Proposta de intervenção completa: agente, ação, meio/modo, finalidade e detalhamento",
+        "Coesão: conectivos variados entre e dentro dos parágrafos",
+        "Limite de 30 linhas; textos com até 7 linhas recebem nota zero"
+      ]
+    }
+  },
+
+  /* Questões que não existem na base pública (api.enem.dev). O enunciado é aberto na fonte de
+     correção indicada; aqui ficam só o número, a área e o gabarito oficial (caderno azul). */
+  FALTANTES: [
+    { ano: 2016, n: 93,  area: "linguagens",        lingua: "ingles", gab: "D", fonte: "Plataforma Assaad", url: "https://plataformaassaad.com.br/questao-93-caderno-azul-do-enem-2016/" },
+    { ano: 2018, n: 62,  area: "ciencias-humanas",  lingua: null,     gab: "B", fonte: "Plataforma Assaad", url: "https://plataformaassaad.com.br/questao-62-caderno-azul-do-enem-2018/" },
+    { ano: 2019, n: 5,   area: "linguagens",        lingua: "ingles", gab: "E", fonte: "Descomplica",       url: "https://descomplica.com.br/gabarito-enem/questoes/2019/primeiro-dia/no-cartum-o-estudante-faz-uma-pergunta-usando-turn-thing-por/" },
+    { ano: 2019, n: 98,  area: "ciencias-natureza", lingua: null,     gab: "E", fonte: "Plataforma Assaad", url: "https://plataformaassaad.com.br/questao-98-caderno-azul-do-enem-2019/" },
+    { ano: 2019, n: 100, area: "ciencias-natureza", lingua: null,     gab: "D", fonte: "Plataforma Assaad", url: "https://plataformaassaad.com.br/questao-100-caderno-azul-do-enem-2019/" },
+    { ano: 2019, n: 128, area: "ciencias-natureza", lingua: null,     gab: "E", fonte: "Plataforma Assaad", url: "https://plataformaassaad.com.br/questao-128-caderno-azul-do-enem-2019/" },
+    { ano: 2020, n: 144, area: "matematica",        lingua: null,     gab: "B", fonte: "Descomplica",       url: "https://descomplica.com.br/gabarito-enem/questoes/2020/segundo-dia/quanto-tempo-em-hora-sera-necessario-para-encher-completamente-o-balde-partindo-do-instante-atual/" },
+    { ano: 2020, n: 168, area: "matematica",        lingua: null,     gab: "A", fonte: "Plataforma Assaad", url: "https://plataformaassaad.com.br/questao-168-caderno-azul-do-enem-2020/" },
+    { ano: 2020, n: 179, area: "matematica",        lingua: null,     gab: "E", fonte: "Plataforma Assaad", url: "https://plataformaassaad.com.br/questao-179-caderno-azul-do-enem-2020/" },
+    { ano: 2023, n: 34,  area: "linguagens",        lingua: null,     gab: "C", fonte: "Plataforma Assaad", url: "https://plataformaassaad.com.br/questao-34-caderno-azul-do-enem-2023/" },
+    { ano: 2023, n: 174, area: "matematica",        lingua: null,     gab: "E", fonte: "Plataforma Assaad", url: "https://plataformaassaad.com.br/questao-174-caderno-azul-do-enem-2023/" }
+  ],
+
+  COMPETENCIAS: [
+    { n: 1, nome: "Competência 1", desc: "Demonstrar domínio da modalidade escrita formal da língua portuguesa." },
+    { n: 2, nome: "Competência 2", desc: "Compreender a proposta de redação e aplicar conceitos das várias áreas de conhecimento para desenvolver o tema, dentro dos limites estruturais do texto dissertativo-argumentativo em prosa." },
+    { n: 3, nome: "Competência 3", desc: "Selecionar, relacionar, organizar e interpretar informações, fatos, opiniões e argumentos em defesa de um ponto de vista." },
+    { n: 4, nome: "Competência 4", desc: "Demonstrar conhecimento dos mecanismos linguísticos necessários para a construção da argumentação." },
+    { n: 5, nome: "Competência 5", desc: "Elaborar proposta de intervenção para o problema abordado, respeitando os direitos humanos." }
+  ]
+};
+
+</script>
+  <script>
+/* Busca as questões na API pública enem.dev (no navegador do usuário) e guarda tudo em IndexedDB para uso offline. */
+(function () {
+  const API = "https://api.enem.dev/v1";
+  const REPO_RAW = "https://raw.githubusercontent.com/yunger7/enem-api/main/public";
+  const DB_NAME = "simulado-enem";
+  let dbPromise = null;
+
+  function db() {
+    if (dbPromise) return dbPromise;
+    dbPromise = new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = () => {
+        const d = req.result;
+        if (!d.objectStoreNames.contains("exams")) d.createObjectStore("exams");
+        if (!d.objectStoreNames.contains("images")) d.createObjectStore("images");
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    return dbPromise;
+  }
+  async function idb(store, mode, fn) {
+    const d = await db();
+    return new Promise((resolve, reject) => {
+      const tx = d.transaction(store, mode);
+      const s = tx.objectStore(store);
+      const r = fn(s);
+      tx.oncomplete = () => resolve(r && "result" in r ? r.result : undefined);
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+  const getExam = (year) => idb("exams", "readonly", (s) => s.get(String(year)));
+  const putExam = (year, data) => idb("exams", "readwrite", (s) => s.put(data, String(year)));
+  const delExam = (year) => idb("exams", "readwrite", (s) => s.delete(String(year)));
+  const getImage = (url) => idb("images", "readonly", (s) => s.get(url));
+  const putImage = (url, blob) => idb("images", "readwrite", (s) => s.put(blob, url));
+  const hasImage = (url) => idb("images", "readonly", (s) => s.count(url)).then((n) => n > 0);
+
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  let lastCall = 0;
+  // A API permite cerca de 1 requisição por segundo.
+  async function apiGet(path, tries = 0) {
+    const wait = Math.max(0, lastCall + 1150 - Date.now());
+    if (wait) await sleep(wait);
+    lastCall = Date.now();
+    const res = await fetch(API + path, { headers: { Accept: "application/json" } });
+    if (res.status === 429 && tries < 6) {
+      const ra = parseInt(res.headers.get("Retry-After") || "3", 10);
+      await sleep((isNaN(ra) ? 3 : ra) * 1000 + 300);
+      return apiGet(path, tries + 1);
+    }
+    if (!res.ok) {
+      let msg = "HTTP " + res.status;
+      try { const j = await res.json(); if (j && j.error) msg += " – " + j.error.message; } catch (e) {}
+      const err = new Error(msg); err.status = res.status; throw err;
+    }
+    return res.json();
+  }
+
+  // Identifica a língua de um texto estrangeiro (a API às vezes não marca a língua da questão).
+  function detectLang(text) {
+    const t = " " + String(text || "").replace(/!\[[^\]]*\]\([^)]*\)/g, " ").toLowerCase() + " ";
+    const en = (t.match(/\b(the|and|of|to|is|are|you|that|with|for|this|it|was|be|have)\b/g) || []).length;
+    const es = (t.match(/\b(el|los|las|y|del|una|por|es|con|pero|muy|más|su|lo|se|como)\b/g) || []).length;
+    if (en >= 3 && en > es * 1.5) return "ingles";
+    if (es >= 3 && es > en * 1.5) return "espanhol";
+    return null;
+  }
+  const sig = (q) => (q.title || "") + "#" + String(q.context || "").slice(0, 200);
+
+  async function fetchAllQuestions(year, onProgress) {
+    const out = new Map();
+    const untagged = []; // versões sem língua (podem ser Inglês/Espanhol mal marcados)
+    const add = (q) => {
+      if (!q.language) untagged.push(q);
+      const k = q.index + "|" + (q.language || "");
+      if (!out.has(k) || q.language) out.set(k, q);
+    };
+    let limit = 50, offset = 0, total = null, guard = 0;
+    while (guard++ < 40) {
+      let r;
+      try {
+        r = await apiGet(`/exams/${year}/questions?limit=${limit}&offset=${offset}`);
+      } catch (e) {
+        if ((e.status === 400 || e.status === 422) && limit > 10) { limit = 10; continue; }
+        throw e;
+      }
+      (r.questions || []).forEach(add);
+      total = r.metadata ? r.metadata.total : null;
+      offset += (r.questions || []).length;
+      onProgress && onProgress({ fase: "questoes", feito: offset, total: total || offset });
+      if (!r.metadata || !r.metadata.hasMore || !(r.questions || []).length) break;
+    }
+    // Garante as duas línguas estrangeiras. A posição delas muda conforme o ano
+    // (em 2016 ficam nas questões 91 a 95), então percorremos a prova inteira com o filtro de língua.
+    for (const lang of ["ingles", "espanhol"]) {
+      let off = 0, g = 0;
+      while (g++ < 10) {
+        let r;
+        try { r = await apiGet(`/exams/${year}/questions?limit=${limit}&offset=${off}&language=${lang}`); } catch (e) { break; }
+        const qs = r.questions || [];
+        const found = qs.filter((q) => q.language === lang);
+        found.forEach(add);
+        // versões sem marcação de língua perto do bloco de língua estrangeira
+        if (found.length) {
+          const lo = Math.min(...found.map((q) => q.index));
+          qs.filter((q) => !q.language && q.index >= lo && q.index < lo + 5).forEach((q) => untagged.push(q));
+        }
+        off += qs.length;
+        if (found.length || !r.metadata || !r.metadata.hasMore || !qs.length) break;
+      }
+    }
+    // Recupera questões de língua estrangeira que vieram sem marcação: classifica pelo texto.
+    const tagged = [...out.values()].filter((q) => q.language);
+    if (tagged.length) {
+      const lo = Math.min(...tagged.map((q) => q.index));
+      for (let idx = lo; idx < lo + 5; idx++) {
+        const versions = new Map();
+        untagged.filter((q) => q.index === idx).forEach((q) => versions.set(sig(q), q));
+        if (out.has(idx + "|ingles") && out.has(idx + "|espanhol")) continue;
+        const list = [...versions.values()];
+        // 1) tenta pelo texto
+        for (const q of list) {
+          const lang = detectLang(q.context);
+          if (lang && !out.has(idx + "|" + lang)) out.set(idx + "|" + lang, Object.assign({}, q, { language: lang }));
+        }
+        // 2) se ainda faltar, consulta o repositório público da enem.dev, que guarda a língua no nome da pasta
+        if (!(out.has(idx + "|ingles") && out.has(idx + "|espanhol"))) {
+          for (const lang of ["ingles", "espanhol"]) {
+            if (out.has(idx + "|" + lang)) continue;
+            try {
+              const res = await fetch(`${REPO_RAW}/${year}/questions/${idx}-${lang}/details.json`);
+              if (!res.ok) continue;
+              const d = await res.json();
+              const match = list.find((q) => sig(q) === sig(d)) || d;
+              out.set(idx + "|" + lang, Object.assign({}, match, { language: lang }));
+              const other = lang === "ingles" ? "espanhol" : "ingles";
+              const rest = list.find((q) => q !== match && sig(q) !== sig(d));
+              if (rest && !out.has(idx + "|" + other)) out.set(idx + "|" + other, Object.assign({}, rest, { language: other }));
+            } catch (e) { /* segue com a versão comum */ }
+          }
+        }
+        if (out.has(idx + "|ingles") && out.has(idx + "|espanhol")) out.delete(idx + "|");
+      }
+    }
+    return [...out.values()].sort((a, b) => a.index - b.index || String(a.language).localeCompare(String(b.language)));
+  }
+
+  function imageUrlsOf(q) {
+    const urls = new Set();
+    const re = /!\[[^\]]*\]\(([^)\s]+)[^)]*\)/g;
+    let m;
+    [q.context, q.alternativesIntroduction].forEach((t) => { if (t) while ((m = re.exec(t))) urls.add(m[1]); });
+    (q.files || []).forEach((u) => u && urls.add(u));
+    (q.alternatives || []).forEach((a) => a.file && urls.add(a.file));
+    return [...urls];
+  }
+
+  async function cacheImages(questions, onProgress) {
+    const urls = [...new Set(questions.flatMap(imageUrlsOf))];
+    let feito = 0, falhas = 0;
+    const queue = urls.slice();
+    async function worker() {
+      while (queue.length) {
+        const u = queue.shift();
+        try {
+          if (!(await hasImage(u))) {
+            const res = await fetch(u, { mode: "cors" });
+            if (!res.ok) throw new Error(res.status);
+            await putImage(u, await res.blob());
+          }
+        } catch (e) { falhas++; }
+        feito++;
+        onProgress && onProgress({ fase: "imagens", feito, total: urls.length, falhas });
+      }
+    }
+    await Promise.all([worker(), worker(), worker(), worker()]);
+    return { total: urls.length, falhas };
+  }
+
+  async function downloadYear(year, onProgress) {
+    const questions = await fetchAllQuestions(year, onProgress);
+    if (!questions.length) throw new Error("A API não retornou questões para " + year);
+    const data = { year, source: "api.enem.dev", savedAt: new Date().toISOString(), questions };
+    await putExam(year, data);
+    const img = await cacheImages(questions, onProgress);
+    data.images = img;
+    await putExam(year, data);
+    return data;
+  }
+
+  // Importação manual (para 2024/2025 ou qualquer ano): aceita o formato da enem.dev
+  // { questions:[...] } ou uma lista de questões, ou um pacote exportado por este simulador.
+  async function importJSON(obj, forcedYear) {
+    const results = [];
+    if (obj && obj.pacote === "simulado-enem" && Array.isArray(obj.exams)) {
+      for (const e of obj.exams) { await putExam(e.year, e); results.push(e.year); }
+      return results;
+    }
+    const qs = Array.isArray(obj) ? obj : obj && obj.questions;
+    if (!Array.isArray(qs) || !qs.length) throw new Error("Arquivo sem lista de questões.");
+    const year = forcedYear || qs[0].year || (obj && obj.year);
+    if (!year) throw new Error("Não foi possível identificar o ano da prova.");
+    await putExam(year, { year: Number(year), source: "importado", savedAt: new Date().toISOString(), questions: qs });
+    results.push(Number(year));
+    return results;
+  }
+
+  async function exportAll(years) {
+    const exams = [];
+    for (const y of years) { const e = await getExam(y); if (e) exams.push(e); }
+    return { pacote: "simulado-enem", versao: 1, exportadoEm: new Date().toISOString(), exams };
+  }
+
+  const objectUrls = new Map();
+  async function resolveImage(url) {
+    if (objectUrls.has(url)) return objectUrls.get(url);
+    try {
+      const blob = await getImage(url);
+      if (blob) { const o = URL.createObjectURL(blob); objectUrls.set(url, o); return o; }
+    } catch (e) {}
+    return url; // sem cache: usa a imagem online
+  }
+
+  window.EnemAPI = { getExam, putExam, delExam, downloadYear, importJSON, exportAll, resolveImage, imageUrlsOf, cacheImages };
+})();
+
+</script>
+  <script>
+/* Integração com a IA (Google Gemini) para corrigir a redação pelas Competências 1 a 5 e explicar questões. */
+(function () {
+  const DEFAULT_KEY = "AQ.Ab8RN6LSV1dS__K_fVNxOEyHe-gLZBzOUG3-G33e93U4w58Utg";
+  const DEFAULT_MODEL = "gemini-flash-lite-latest";
+  const FALLBACK_MODELS = ["gemini-flash-lite-latest", "gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-2.5-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
+
+  function settings() {
+    try { return JSON.parse(localStorage.getItem("sim:config") || "{}"); } catch (e) { return {}; }
+  }
+
+  async function call(prompt, { json = false } = {}) {
+    const cfg = settings();
+    const key = (cfg.apiKey || "").trim() || DEFAULT_KEY;
+    const models = [...new Set([(cfg.model || "").trim() || DEFAULT_MODEL, ...FALLBACK_MODELS])];
+    const endpoints = [
+      (m) => `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,
+      (m) => `https://aiplatform.googleapis.com/v1/publishers/google/models/${m}:generateContent`
+    ];
+    const body = {
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: Object.assign({ temperature: 0.2 }, json ? { responseMimeType: "application/json" } : {})
+    };
+    const errors = [];
+    for (const ep of endpoints) {
+      for (const m of models) {
+        try {
+          const res = await fetch(ep(m) + "?key=" + encodeURIComponent(key), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            errors.push(`${m}: ${res.status} ${(data.error && data.error.message) || ""}`.trim());
+            if (res.status === 401 || res.status === 403) break; // chave sem acesso a este endpoint
+            continue; // 404 (modelo indisponível) ou 429 (sem cota): tenta o próximo modelo
+          }
+          const text = (data.candidates || [])
+            .flatMap((c) => (c.content && c.content.parts) || [])
+            .filter((p) => !p.thought).map((p) => p.text || "").join("");
+          if (text) return text;
+          errors.push(`${m}: resposta vazia`);
+        } catch (e) {
+          errors.push(`${m}: ${e.message}`);
+        }
+      }
+    }
+    throw new Error("Não foi possível falar com a IA.\n" + errors.slice(0, 4).join("\n"));
+  }
+
+  function parseJSON(text) {
+    const t = text.trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+    try { return JSON.parse(t); } catch (e) {}
+    const a = t.indexOf("{"), b = t.lastIndexOf("}");
+    if (a >= 0 && b > a) return JSON.parse(t.slice(a, b + 1));
+    throw new Error("A IA respondeu em formato inesperado.");
+  }
+
+  const snap = (n) => Math.max(0, Math.min(200, Math.round((Number(n) || 0) / 40) * 40));
+
+  async function corrigirRedacao({ tema, texto, ano }) {
+    const C = window.ENEM_DATA.COMPETENCIAS;
+    const linhas = texto.split(/\n/).filter((l) => l.trim()).length;
+    const prompt = `Você é um corretor oficial da redação do Exame Nacional do Ensino Médio, treinado conforme a Cartilha do Participante publicada pelo Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira.
+Corrija, de maneira formal, rigorosa e imparcial, a redação abaixo, escrita para a edição de ${ano}.
+
+Tema proposto: "${tema}"
+
+Avalie cada uma das cinco competências, atribuindo a cada uma exatamente um destes valores: 0, 40, 80, 120, 160 ou 200.
+${C.map((c) => `- ${c.nome}: ${c.desc}`).join("\n")}
+
+Aplique os critérios de anulação (nota zero em todas as competências) quando houver: fuga total ao tema; texto que não seja dissertativo-argumentativo; texto com até sete linhas; parte deliberadamente desconectada do tema; identificação do participante; ou texto em branco. Considere também os critérios da Cartilha sobre desrespeito aos direitos humanos na avaliação da Competência 5.
+O texto possui aproximadamente ${linhas} linhas não vazias (o limite oficial é de 30 linhas).
+
+Avalie cada competência de forma INDEPENDENTE: é normal que as notas sejam diferentes entre si. Use estes níveis de referência:
+- Competência 1 (norma escrita): 200 = no máximo dois desvios leves, sem reincidência; 160 = poucos desvios; 120 = desvios frequentes, mas com estrutura sintática regular; 80 = muitos desvios de concordância, regência, pontuação ou ortografia; 40 = domínio precário, com desvios diversos e frequentes; 0 = desconhecimento da norma.
+- Competência 2 (tema e tipo textual): 200 = abordagem completa do tema, repertório legitimado, pertinente e produtivo, e excelente domínio do texto dissertativo-argumentativo; 160 = repertório pertinente, mas pouco produtivo; 120 = abordagem completa com argumentação previsível ou repertório apenas baseado nos textos motivadores ou no senso comum; 80 = cópia dos motivadores ou domínio insuficiente da estrutura; 40 = tangencia o tema; 0 = fuga ao tema ou outro tipo textual.
+- Competência 3 (argumentação): 200 = projeto de texto estratégico, com argumentos desenvolvidos e consistentes; 160 = projeto claro, com poucas falhas de desenvolvimento; 120 = argumentos limitados, pouco desenvolvidos ou de senso comum; 80 = informações desorganizadas ou contraditórias; 40 = pouco relacionadas ao tema; 0 = sem defesa de ponto de vista.
+- Competência 4 (coesão): 200 = repertório diversificado de recursos coesivos entre e dentro dos parágrafos, sem inadequações; 160 = poucas inadequações; 120 = repertório pouco diversificado (repetição de conectivos como "também", "então", "isso"); 80 = coesão insuficiente; 40 = precária; 0 = ausente.
+- Competência 5 (proposta de intervenção): conte os elementos presentes: agente, ação, modo ou meio, finalidade e detalhamento. 200 = os cinco elementos, bem articulados à discussão; 160 = quatro elementos; 120 = três; 80 = dois; 40 = um ou proposta vaga ("o governo tem que fazer alguma coisa"); 0 = ausente ou desrespeito aos direitos humanos.
+Antes de atribuir cada nota, liste os desvios e problemas concretos encontrados naquela competência e escolha o nível que melhor corresponde a eles. Na dúvida entre dois níveis, atribua o menor.
+
+Regras de redação da sua resposta:
+- Escreva sempre em português formal.
+- Não use abreviações: escreva "Competência 1", "Competência 2" etc. por extenso, nunca "C1"; escreva "Exame Nacional do Ensino Médio" ou "Enem", nunca siglas sem explicação.
+- Em cada competência, justifique a nota citando trechos curtos do próprio texto do participante e indique o nível de desempenho correspondente.
+
+Responda SOMENTE com um objeto JSON válido, neste formato:
+{
+  "anulada": false,
+  "motivoAnulacao": "",
+  "competencias": [
+    {"numero": 1, "desvios": ["problemas concretos encontrados nesta competência"], "nota": 0, "nivel": "descrição do nível de desempenho", "justificativa": "texto formal", "comoMelhorar": "orientações objetivas"}
+  ],
+  "parecerGeral": "parecer formal em um ou dois parágrafos",
+  "pontosFortes": ["..."],
+  "pontosAMelhorar": ["..."]
+}
+
+Redação do participante:
+"""
+${texto}
+"""`;
+    const r = parseJSON(await call(prompt, { json: true }));
+    const comps = C.map((c) => {
+      const f = (r.competencias || []).find((x) => Number(x.numero) === c.n) || {};
+      return {
+        numero: c.n, nome: c.nome, desc: c.desc,
+        nota: r.anulada ? 0 : snap(f.nota),
+        nivel: f.nivel || "", justificativa: f.justificativa || "", comoMelhorar: f.comoMelhorar || ""
+      };
+    });
+    return {
+      anulada: !!r.anulada, motivoAnulacao: r.motivoAnulacao || "",
+      competencias: comps,
+      total: comps.reduce((s, c) => s + c.nota, 0),
+      parecerGeral: r.parecerGeral || "", pontosFortes: r.pontosFortes || [], pontosAMelhorar: r.pontosAMelhorar || [],
+      corrigidaEm: new Date().toISOString()
+    };
+  }
+
+  async function explicarQuestao({ q, marcada, area }) {
+    const alts = (q.alternatives || []).map((a) => `${a.letter}) ${a.text || "[alternativa em imagem]"}`).join("\n");
+    const prompt = `Você é um professor experiente de cursinho preparatório para o Exame Nacional do Ensino Médio. Explique, em português formal e didático, a resolução da questão ${q.index} da prova de ${q.year} (${area}).
+${q.context ? "Texto-base:\n" + q.context.replace(/!\[[^\]]*\]\([^)]*\)/g, "[imagem]") : ""}
+${q.alternativesIntroduction ? "\nComando: " + q.alternativesIntroduction : ""}
+Alternativas:
+${alts}
+
+Gabarito oficial: ${q.correctAlternative}.
+${marcada ? `O estudante marcou: ${marcada}.` : "O estudante deixou em branco."}
+
+Estruture a resposta em: 1) o que a questão pede; 2) resolução passo a passo; 3) por que a alternativa ${q.correctAlternative} está correta; 4) ${marcada && marcada !== q.correctAlternative ? `por que a alternativa ${marcada} está incorreta;` : "armadilhas comuns;"} 5) conteúdo a revisar. Seja objetivo (no máximo 250 palavras). Se houver imagem que você não vê, diga o que ela provavelmente mostra com base no enunciado.`;
+    return call(prompt);
+  }
+
+  window.EnemAI = { corrigirRedacao, explicarQuestao, DEFAULT_MODEL };
+})();
+
+</script>
+  <script>
+/* Simulado ENEM – lógica da interface. */
+(function () {
+  const D = window.ENEM_DATA;
+  const API = window.EnemAPI;
+  const AI = window.EnemAI;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const view = $("#view");
+  const exams = {};          // ano -> {questions}
+  const downloading = {};    // ano -> progresso
+  let timerHandle = null;
+
+  /* ---------- utilidades ---------- */
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
+  const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { toast("Não foi possível salvar o progresso no navegador."); } };
+  const cfg = () => load("sim:config", {});
+  const setCfg = (patch) => save("sim:config", Object.assign(cfg(), patch));
+  let USER = null; // usuário logado (primeiro nome em minúsculas)
+  const sessKey = (y, d) => `sim:u:${USER}:sessao:${y}:${d}`;
+  const getSess = (y, d) => load(sessKey(y, d), null);
+  const setSess = (y, d, s) => save(sessKey(y, d), s);
+  let ui = { tab: "inicio", sub: {} };
+  const saveUI = () => USER && save(`sim:u:${USER}:ui`, ui);
+
+  function toast(msg, ms = 3200) {
+    const t = $("#toast"); t.textContent = msg; t.hidden = false;
+    clearTimeout(toast._h); toast._h = setTimeout(() => (t.hidden = true), ms);
+  }
+  function modal(html) { $("#modalBody").innerHTML = html; $("#modal").hidden = false; }
+  function closeModal() { $("#modal").hidden = true; }
+  $("#modalClose").onclick = closeModal;
+  $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") closeModal(); });
+
+  function fmtTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  }
+
+  /* Markdown simples (formato usado pela enem.dev) */
+  function md(text) {
+    if (!text) return "";
+    let s = esc(text);
+    s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)[^)]*\)/g, (_, alt, url) => `<img data-src="${url}" alt="${alt || "Imagem da questão"}" loading="lazy">`);
+    s = s.replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, "$1");
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/__([^_]+)__/g, "<strong>$1</strong>");
+    s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>").replace(/(^|\W)_([^_\n]+)_(?=\W|$)/g, "$1<em>$2</em>");
+    return s.split(/\n{2,}/).map((p) => {
+      p = p.trim(); if (!p) return "";
+      if (/^(\d+[.)]|[-*•]) /m.test(p) && p.split("\n").every((l) => /^(\d+[.)]|[-*•]) /.test(l.trim()))) {
+        const ordered = /^\d/.test(p.trim());
+        const items = p.split("\n").map((l) => `<li>${l.trim().replace(/^(\d+[.)]|[-*•]) /, "")}</li>`).join("");
+        return ordered ? `<ol>${items}</ol>` : `<ul>${items}</ul>`;
+      }
+      if (/^#{1,4} /.test(p)) return `<h4>${p.replace(/^#{1,4} /, "")}</h4>`;
+      if (/^&gt;/.test(p)) return `<blockquote>${p.replace(/^&gt;\s?/gm, "").replace(/\n/g, "<br>")}</blockquote>`;
+      return `<p>${p.replace(/\n/g, "<br>")}</p>`;
+    }).join("");
+  }
+  async function hydrateImages(root) {
+    for (const img of $$("img[data-src]", root)) {
+      const url = img.dataset.src; img.removeAttribute("data-src");
+      img.src = await API.resolveImage(url);
+      img.onerror = () => { img.alt = "Imagem indisponível offline – conecte-se à internet e baixe a prova novamente."; img.classList.add("broken"); };
+    }
+  }
+
+  /* ---------- dados da prova ---------- */
+  async function ensureExam(year) {
+    if (exams[year]) return exams[year];
+    const e = await API.getExam(year).catch(() => null);
+    if (e) exams[year] = e;
+    return e;
+  }
+  /* A API às vezes classifica a área errada. A área real é definida pelo bloco de 45 questões
+     do caderno (1–45, 46–90, 91–135, 136–180): usamos a área majoritária de cada bloco. */
+  function areaMap(e) {
+    if (e._areaMap) return e._areaMap;
+    const map = {};
+    for (let b = 0; b < 4; b++) {
+      const c = {};
+      e.questions.filter((q) => q.index > b * 45 && q.index <= (b + 1) * 45).forEach((q) => { if (q.discipline) c[q.discipline] = (c[q.discipline] || 0) + 1; });
+      map[b] = Object.keys(c).sort((x, y) => c[y] - c[x])[0];
+    }
+    return (e._areaMap = map);
+  }
+  function areaOf(q, e) { return areaMap(e)[Math.floor((q.index - 1) / 45)] || q.discipline; }
+  function questionsFor(year, day, lang) {
+    const e = exams[year]; if (!e) return [];
+    const areas = D.DAYS[day].areas;
+    const list = e.questions.map((q) => Object.assign({}, q, { discipline: areaOf(q, e) }))
+      .filter((q) => areas.includes(q.discipline))
+      .filter((q) => !q.language || q.language === lang);
+    // questões ausentes da base pública: entram com o gabarito oficial e o enunciado aberto na fonte
+    const has = new Set(list.map((q) => q.index));
+    (D.FALTANTES || []).filter((f) => f.ano === Number(year) && areas.includes(f.area) && (!f.lingua || f.lingua === lang) && !has.has(f.n))
+      .forEach((f) => list.push({
+        index: f.n, year: f.ano, discipline: f.area, language: f.lingua, title: `Questão ${f.n} - ENEM ${f.ano}`,
+        context: null, files: [], alternativesIntroduction: null, correctAlternative: f.gab,
+        alternatives: ["A", "B", "C", "D", "E"].map((l) => ({ letter: l, text: null, file: null, isCorrect: l === f.gab })),
+        externa: { url: f.url, fonte: f.fonte }
+      }));
+    // se existe versão na língua escolhida, descarta a versão sem língua do mesmo número
+    const withLang = new Set(list.filter((q) => q.language).map((q) => q.index));
+    const seen = new Set();
+    return list.filter((q) => !(withLang.has(q.index) && !q.language))
+      .filter((q) => { if (seen.has(q.index)) return false; seen.add(q.index); return true; })
+      .sort((a, b) => areas.indexOf(a.discipline) - areas.indexOf(b.discipline) || a.index - b.index);
+  }
+  const qKey = (q) => q.index + "|" + (q.language || "");
+  function langsAvailable(year) {
+    const e = exams[year]; if (!e) return [];
+    return [...new Set(e.questions.map((q) => q.language).filter(Boolean))];
+  }
+
+  /* ---------- abas ---------- */
+  function renderTabs() {
+    const tabs = [{ id: "inicio", label: "Início" }, ...D.YEARS.map((y) => ({ id: String(y), label: "ENEM " + y, year: y })), { id: "desempenho", label: "Desempenho" }];
+    $("#tabs").innerHTML = tabs.map((t) => {
+      const dot = t.year ? `<span class="dot ${exams[t.year] ? "ready" : ""}"></span>` : "";
+      return `<button class="tab ${ui.tab === t.id ? "active" : ""}" role="tab" data-tab="${t.id}">${t.label}${dot}</button>`;
+    }).join("");
+    $$(".tab").forEach((b) => (b.onclick = () => go(b.dataset.tab)));
+  }
+  function go(tab) {
+    ui.tab = tab; saveUI(); stopTimer(); render();
+    window.scrollTo({ top: 0 });
+  }
+  async function render() {
+    renderTabs();
+    if (ui.tab === "inicio") return renderHome();
+    if (ui.tab === "desempenho") return renderPerformance();
+    const y = Number(ui.tab);
+    await ensureExam(y); renderTabs();
+    return renderYear(y);
+  }
+
+  /* ---------- Início ---------- */
+  async function renderHome() {
+    await Promise.all(D.YEARS.map(ensureExam)); renderTabs();
+    const c = cfg();
+    const ready = D.YEARS.filter((y) => exams[y]).length;
+    view.innerHTML = `
+      <section class="card hero">
+        <h1>Simulado ENEM 2016 – 2023</h1>
+        <p>Oito provas completas, com as 180 questões oficiais de cada edição (45 por área), divididas em Dia 1 e Dia 2, cronômetro de 6 horas por dia, correção automática do gabarito e correção da redação por inteligência artificial nas cinco competências.</p>
+        <div class="row" style="margin-top:14px">
+          <button class="btn gold" id="dlAll">${ready === D.YEARS.length ? "Atualizar todas as provas" : "Baixar todas as provas para uso offline"}</button>
+          <span class="small">${ready}/${D.YEARS.length} provas salvas neste navegador</span>
+        </div>
+        <div id="dlAllStatus" class="small" style="margin-top:10px"></div>
+      </section>
+
+      <section class="card">
+        <h2>Como funciona</h2>
+        <ol class="muted">
+          <li>Na primeira vez, com internet, baixe as provas. Questões, alternativas, gabaritos e imagens ficam guardados no navegador e passam a funcionar offline.</li>
+          <li>Abra a aba de um ano e escolha <b>Dia 1</b> (Linguagens, Ciências Humanas e Redação) ou <b>Dia 2</b> (Ciências da Natureza e Matemática).</li>
+          <li>Leia o resumo dos tópicos e clique em <b>Iniciar prova</b>. O cronômetro de 6 horas começa e o progresso é salvo automaticamente.</li>
+          <li>Vire as páginas com os botões, com as setas ← → do teclado ou deslizando o dedo. Clique com o botão direito numa alternativa para riscá-la.</li>
+          <li>Ao finalizar, veja os acertos por área, revise cada questão e peça à IA a correção da redação ou a explicação de uma questão.</li>
+        </ol>
+      </section>
+
+      <section class="grid">
+        ${D.YEARS.map((y) => {
+          const s1 = getSess(y, 1), s2 = getSess(y, 2);
+          const st = (s) => !s ? "" : s.finished ? '<span class="pill ok">concluído</span>' : '<span class="pill warn">em andamento</span>';
+          return `<div class="card year-card">
+            <div class="row"><h3>${y}</h3><span class="spacer"></span>${exams[y] ? '<span class="pill ok">offline</span>' : '<span class="pill">não baixada</span>'}</div>
+            <div class="theme">Redação: “${esc(D.THEMES[y])}”</div>
+            <div class="small" style="margin:8px 0">Dia 1 ${st(s1) || "—"} &nbsp; Dia 2 ${st(s2) || "—"}</div>
+            <button class="btn primary" data-open="${y}">Abrir prova</button>
+          </div>`;
+        }).join("")}
+      </section>
+
+      <section class="card">
+        <h2>Configurações</h2>
+        <div class="grid">
+          <label class="field">Língua estrangeira padrão
+            <select id="cfgLang"><option value="ingles">Inglês</option><option value="espanhol">Espanhol</option></select></label>
+          <label class="field">Modelo de IA
+            <input type="text" id="cfgModel" placeholder="${AI.DEFAULT_MODEL}" value="${esc(c.model || "")}"></label>
+          <label class="field">Chave de API (opcional, substitui a chave embutida)
+            <input type="password" id="cfgKey" placeholder="usando a chave embutida" value="${esc(c.apiKey || "")}"></label>
+        </div>
+        <div class="row" style="margin-top:14px">
+          <button class="btn" id="cfgSave">Salvar configurações</button>
+          <span class="spacer"></span>
+          <button class="btn" id="exportBtn">Exportar pacote offline</button>
+          <label class="btn">Importar pacote<input type="file" id="importFile" accept=".json,application/json" hidden></label>
+          <button class="btn danger" id="resetBtn">Apagar progresso</button>
+        </div>
+        <p class="small muted">O pacote exportado (.json) leva as provas para outro computador ou navegador sem precisar baixar de novo. As imagens são baixadas novamente no primeiro uso online.</p>
+      </section>`;
+
+    $("#cfgLang").value = c.lang || "ingles";
+    $$("[data-open]").forEach((b) => (b.onclick = () => go(b.dataset.open)));
+    $("#cfgSave").onclick = () => { setCfg({ lang: $("#cfgLang").value, model: $("#cfgModel").value.trim(), apiKey: $("#cfgKey").value.trim() }); toast("Configurações salvas."); };
+    $("#dlAll").onclick = async () => {
+      const st = $("#dlAllStatus"); $("#dlAll").disabled = true;
+      for (const y of D.YEARS) {
+        try {
+          await download(y, (p) => { st.innerHTML = `<span class="spinner"></span> ENEM ${y}: ${p.fase === "questoes" ? "questões" : "imagens"} ${p.feito}/${p.total}`; });
+        } catch (e) { st.textContent = `ENEM ${y}: falhou (${e.message}). Continuando…`; }
+      }
+      st.textContent = "Pronto! Provas salvas para uso offline.";
+      renderHome();
+    };
+    $("#exportBtn").onclick = async () => {
+      const pkg = await API.exportAll(D.YEARS);
+      if (!pkg.exams.length) return toast("Nenhuma prova baixada ainda.");
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(pkg)], { type: "application/json" }));
+      a.download = "simulado-enem-pacote.json"; a.click();
+    };
+    $("#importFile").onchange = async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      try {
+        const yrs = await API.importJSON(JSON.parse(await f.text()));
+        yrs.forEach((y) => delete exams[y]);
+        toast("Importado: " + yrs.join(", ")); renderHome();
+      } catch (err) { toast("Falha ao importar: " + err.message); }
+    };
+    $("#resetBtn").onclick = () => {
+      if (!confirm("Apagar todas as respostas, cronômetros e correções? As provas baixadas continuam salvas.")) return;
+      Object.keys(localStorage).filter((k) => k.startsWith(`sim:u:${USER}:sessao:`)).forEach((k) => localStorage.removeItem(k));
+      toast("Progresso apagado."); renderHome();
+    };
+  }
+
+  async function download(year, onProgress) {
+    downloading[year] = true;
+    try {
+      const data = await API.downloadYear(year, onProgress);
+      exams[year] = data;
+      return data;
+    } finally { delete downloading[year]; renderTabs(); }
+  }
+
+  /* ---------- Aba de um ano ---------- */
+  function renderYear(year) {
+    const day = ui.sub[year] || 1;
+    const sub = [1, 2].map((d) => `<button class="subtab ${d === day ? "active" : ""}" data-day="${d}">${D.DAYS[d].titulo}<small>${D.DAYS[d].sub}</small></button>`).join("");
+    view.innerHTML = `<div class="row"><h1 style="margin-right:12px">ENEM ${year}</h1><span class="spacer"></span></div>
+      <div class="subtabs" role="tablist">${sub}</div><div id="dayView"></div>`;
+    $$(".subtab").forEach((b) => (b.onclick = () => { ui.sub[year] = Number(b.dataset.day); saveUI(); stopTimer(); renderYear(year); }));
+    renderDay(year, day);
+  }
+
+  function renderDay(year, day) {
+    const box = $("#dayView");
+    if (!exams[year]) return renderDownload(box, year, day);
+    const s = getSess(year, day);
+    if (!s || !s.started) return renderBriefing(box, year, day);
+    if (!s.finished) return renderExam(box, year, day);
+    return renderResults(box, year, day);
+  }
+
+  function renderDownload(box, year, day) {
+    box.innerHTML = `<div class="card">
+      <h2>Prova ainda não baixada</h2>
+      <p class="muted">Conecte-se à internet uma vez para buscar as 180 questões, as imagens e o gabarito oficial do ENEM ${year}. Depois disso, tudo funciona offline.</p>
+      <button class="btn primary" id="dlOne">Baixar ENEM ${year}</button>
+      <div style="margin-top:14px"><div class="progress"><i id="dlBar"></i></div><p class="small muted" id="dlTxt"></p></div>
+    </div>`;
+    $("#dlOne").onclick = async () => {
+      $("#dlOne").disabled = true;
+      try {
+        await download(year, (p) => {
+          $("#dlBar") && ($("#dlBar").style.width = (100 * p.feito / Math.max(1, p.total)) + "%");
+          $("#dlTxt") && ($("#dlTxt").textContent = p.fase === "questoes" ? `Questões: ${p.feito} de ${p.total}` : `Imagens: ${p.feito} de ${p.total}${p.falhas ? ` (${p.falhas} ficarão só online)` : ""}`);
+        });
+        toast(`ENEM ${year} salvo para uso offline.`);
+        renderYear(year);
+      } catch (e) {
+        $("#dlOne").disabled = false;
+        $("#dlTxt").textContent = "Não foi possível baixar: " + e.message + ". Verifique a conexão e tente de novo.";
+      }
+    };
+  }
+
+  /* Resumo dos tópicos antes da prova */
+  function briefingHTML(year, day) {
+    const T = D.TOPICS;
+    const keys = ["interpretacao", ...D.DAYS[day].areas, ...(D.DAYS[day].redacao ? ["redacao"] : [])];
+    const topics = keys.map((k) => `<div class="topic"><h3>${T[k].titulo}</h3><ul>${T[k].itens.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>`).join("");
+    const comps = D.DAYS[day].redacao ? `
+      <h2 style="margin-top:22px">Competências avaliadas na redação</h2>
+      <p class="muted small">Cada competência vale de 0 a 200 pontos, em níveis de 40 em 40, somando até 1000 pontos.</p>
+      <div class="comp-list">${D.COMPETENCIAS.map((c) => `<div class="comp"><b>${c.nome}</b><span>${esc(c.desc)}</span></div>`).join("")}</div>
+      <p style="margin-top:12px"><span class="pill">Tema de ${year}</span> <em style="font-family:var(--serif)">“${esc(D.THEMES[year])}”</em></p>` : "";
+    return `<h2>O que você precisa dominar</h2><div class="topics">${topics}</div>${comps}`;
+  }
+
+  function renderBriefing(box, year, day) {
+    const langs = langsAvailable(year);
+    const lang = cfg().lang || "ingles";
+    const qs = questionsFor(year, day, langs.includes(lang) ? lang : langs[0]);
+    const counts = D.DAYS[day].areas.map((a) => `${D.AREAS[a].curto}: ${qs.filter((q) => q.discipline === a).length} questões`).join(" · ");
+    const faltam = 90 - qs.length;
+    box.innerHTML = `<div class="card">${briefingHTML(year, day)}</div>
+      <div class="card">
+        <h2>Pronto para começar?</h2>
+        <p class="muted">${counts}${D.DAYS[day].redacao ? " · Redação" : ""} · Tempo: 6 horas</p>
+        ${faltam > 0 ? `<p class="small"><span class="pill warn">Aviso</span> A base de questões usada pelo simulador não tem ${faltam} ${faltam === 1 ? "questão" : "questões"} deste dia. ${faltam === 1 ? "Ela fica" : "Elas ficam"} de fora da prova e da contagem de acertos.</p>` : ""}
+        ${day === 1 && langs.length ? `<label class="field" style="max-width:260px;margin-bottom:14px">Língua estrangeira
+          <select id="langSel">${langs.map((l) => `<option value="${l}" ${l === lang ? "selected" : ""}>${l === "ingles" ? "Inglês" : l === "espanhol" ? "Espanhol" : l}</option>`).join("")}</select></label>` : ""}
+        <div class="row">
+          <button class="btn primary" id="startBtn">Iniciar prova · 6:00:00</button>
+          <button class="btn ghost" id="redlBtn">Baixar novamente</button>
+        </div>
+      </div>`;
+    $("#startBtn").onclick = () => {
+      const l = $("#langSel") ? $("#langSel").value : lang;
+      setSess(year, day, { started: true, lang: l, elapsed: 0, runningSince: Date.now(), answers: {}, struck: {}, marked: [], page: 0, redacao: { titulo: "", texto: "" }, finished: false });
+      renderDay(year, day);
+    };
+    $("#redlBtn").onclick = async () => { await API.delExam(year); delete exams[year]; render(); };
+  }
+
+  /* ---------- Prova em andamento ---------- */
+  function elapsedOf(s) { return s.elapsed + (s.runningSince ? (Date.now() - s.runningSince) / 1000 : 0); }
+  function stopTimer() { clearInterval(timerHandle); timerHandle = null; }
+
+  function renderExam(box, year, day) {
+    const s = getSess(year, day);
+    const qs = questionsFor(year, day, s.lang);
+    const pages = qs.map((q) => ({ type: "q", q }));
+    if (D.DAYS[day].redacao) pages.push({ type: "redacao" });
+    if (s.page >= pages.length) s.page = 0;
+
+    box.innerHTML = `
+      <div class="exam-head">
+        <span class="timer" id="timer">--:--:--</span>
+        <button class="btn ghost small" id="pauseBtn">${s.runningSince ? "Pausar" : "Retomar"}</button>
+        <div class="progress" title="Respondidas"><i id="ansBar"></i></div>
+        <span class="small" id="ansTxt"></span>
+        <button class="btn small" id="gridBtn">Questões</button>
+        <button class="btn small" id="topicsBtn">Tópicos</button>
+        ${D.DAYS[day].redacao ? '<button class="btn small" id="essayBtn">Redação</button>' : ""}
+        <button class="btn primary small" id="finishBtn">Finalizar</button>
+      </div>
+      <div class="book" id="book"><article class="page" id="page"></article></div>
+      <div class="pager">
+        <button class="btn" id="prevBtn">← Anterior</button>
+        <span class="small muted" id="pageTxt"></span>
+        <button class="btn primary" id="nextBtn">Próxima →</button>
+      </div>`;
+
+    const persist = () => setSess(year, day, s);
+    function updateHead() {
+      const n = qs.filter((q) => s.answers[qKey(q)]).length;
+      $("#ansBar").style.width = (100 * n / Math.max(1, qs.length)) + "%";
+      $("#ansTxt").textContent = `${n}/${qs.length}`;
+    }
+    function tick() {
+      const left = D.EXAM_SECONDS - elapsedOf(s);
+      const t = $("#timer"); if (!t) return stopTimer();
+      t.textContent = fmtTime(left);
+      t.classList.toggle("low", left < 30 * 60);
+      if (left <= 0) { stopTimer(); toast("Tempo esgotado! A prova foi finalizada."); finish(); }
+    }
+    stopTimer(); tick(); timerHandle = setInterval(tick, 1000);
+
+    $("#pauseBtn").onclick = () => {
+      if (s.runningSince) { s.elapsed = elapsedOf(s); s.runningSince = null; $("#pauseBtn").textContent = "Retomar"; }
+      else { s.runningSince = Date.now(); $("#pauseBtn").textContent = "Pausar"; }
+      persist(); tick();
+    };
+
+    function drawPage() {
+      const p = pages[s.page];
+      const el = $("#page");
+      $("#pageTxt").textContent = p.type === "q" ? `Página ${s.page + 1} de ${pages.length}` : "Folha de redação";
+      $("#prevBtn").disabled = s.page === 0;
+      $("#nextBtn").textContent = s.page === pages.length - 1 ? "Finalizar" : "Próxima →";
+      if (p.type === "redacao") { el.style.setProperty("--page-color", "var(--accent-2)"); el.innerHTML = essayHTML(year, s); bindEssay(el, s, persist); return; }
+      const q = p.q, area = D.AREAS[q.discipline], k = qKey(q);
+      el.style.setProperty("--page-color", area.cor);
+      const marked = s.marked.includes(k);
+      el.innerHTML = `
+        <div class="q-meta">
+          <span class="q-num">Questão ${q.index}</span>
+          <span class="pill" style="color:${area.cor};background:color-mix(in srgb, ${area.cor} 12%, transparent)">${area.curto}</span>
+          ${q.language ? `<span class="pill">${q.language === "ingles" ? "Inglês" : "Espanhol"}</span>` : ""}
+          <span class="spacer"></span>
+          <button class="btn ghost small" id="markBtn">${marked ? "★ Marcada para revisão" : "☆ Marcar para revisão"}</button>
+        </div>
+        ${questionBody(q)}
+        <div class="alts">${q.alternatives.map((a) => {
+          const sel = s.answers[k] === a.letter, st = (s.struck[k] || []).includes(a.letter);
+          return `<button class="alt ${sel ? "selected" : ""} ${st ? "struck" : ""}" data-l="${a.letter}">
+            <span class="letter">${a.letter}</span><span class="alt-body">${a.text ? md(a.text) : ""}${a.file ? `<img data-src="${esc(a.file)}" alt="Alternativa ${a.letter}">` : ""}${!a.text && !a.file ? `Alternativa ${a.letter}` : ""}</span></button>`;
+        }).join("")}</div>
+        <p class="hint">Dica: clique com o botão direito (ou mantenha pressionado) numa alternativa para riscá-la. Teclas A–E marcam a resposta.</p>`;
+      hydrateImages(el);
+      $("#markBtn").onclick = () => {
+        s.marked = marked ? s.marked.filter((x) => x !== k) : [...s.marked, k]; persist(); drawPage();
+      };
+      $$(".alt", el).forEach((b) => {
+        b.onclick = () => { const L = b.dataset.l; s.answers[k] = s.answers[k] === L ? undefined : L; if (!s.answers[k]) delete s.answers[k]; persist(); updateHead(); drawPage(); };
+        b.oncontextmenu = (e) => { e.preventDefault(); const L = b.dataset.l; const arr = s.struck[k] || []; s.struck[k] = arr.includes(L) ? arr.filter((x) => x !== L) : [...arr, L]; persist(); drawPage(); };
+      });
+    }
+
+    let busy = false;
+    function goTo(i) {
+      if (busy || i < 0 || i >= pages.length || i === s.page) return;
+      const dir = i > s.page ? "next" : "prev";
+      const el = $("#page"); busy = true;
+      el.classList.add("turn-out-" + dir);
+      setTimeout(() => {
+        el.classList.remove("turn-out-" + dir);
+        s.page = i; persist(); drawPage();
+        el.classList.add("turn-in-" + dir);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setTimeout(() => { el.classList.remove("turn-in-" + dir); busy = false; }, 430);
+      }, matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 360);
+    }
+    $("#prevBtn").onclick = () => goTo(s.page - 1);
+    $("#nextBtn").onclick = () => s.page === pages.length - 1 ? confirmFinish() : goTo(s.page + 1);
+    $("#essayBtn") && ($("#essayBtn").onclick = () => goTo(pages.length - 1));
+    $("#topicsBtn").onclick = () => modal(briefingHTML(year, day));
+    $("#gridBtn").onclick = () => {
+      const byArea = D.DAYS[day].areas.map((a) => `<div class="qgrid-area">${D.AREAS[a].nome}</div><div class="qgrid">${
+        pages.map((p, i) => p.type === "q" && p.q.discipline === a ? `<button data-i="${i}" class="${s.answers[qKey(p.q)] ? "answered" : ""} ${s.marked.includes(qKey(p.q)) ? "marked" : ""} ${i === s.page ? "current" : ""}">${p.q.index}</button>` : "").join("")}</div>`).join("");
+      modal(`<h2>Mapa de questões</h2><p class="small muted">Azul = respondida · linha dourada = marcada para revisão</p>${byArea}`);
+      $$("#modalBody [data-i]").forEach((b) => (b.onclick = () => { closeModal(); goTo(Number(b.dataset.i)); }));
+    };
+    $("#finishBtn").onclick = confirmFinish;
+
+    function confirmFinish() {
+      const blank = qs.filter((q) => !s.answers[qKey(q)]).length;
+      const essayEmpty = D.DAYS[day].redacao && !(s.redacao.texto || "").trim();
+      modal(`<h2>Finalizar o ${D.DAYS[day].titulo}?</h2>
+        <p>${blank ? `Você deixou <b>${blank}</b> questões em branco.` : "Todas as questões foram respondidas."}${essayEmpty ? " A redação está em branco." : ""}</p>
+        <p class="muted small">Depois de finalizar, as respostas não podem mais ser alteradas.</p>
+        <div class="row"><button class="btn" id="cancelF">Continuar a prova</button><button class="btn primary" id="okF">Finalizar e ver resultado</button></div>`);
+      $("#cancelF").onclick = closeModal;
+      $("#okF").onclick = () => { closeModal(); finish(); };
+    }
+    function finish() {
+      stopTimer();
+      s.elapsed = elapsedOf(s); s.runningSince = null;
+      s.finished = true; s.finishedAt = new Date().toISOString(); s.page = 0;
+      s.result = computeResult(qs, s);
+      persist(); renderDay(year, day);
+    }
+
+    // teclado e gesto
+    document.onkeydown = (e) => {
+      if (!$("#page") || !$("#modal").hidden) return;
+      if (/textarea|input|select/i.test(document.activeElement.tagName)) return;
+      if (e.key === "ArrowRight") goTo(s.page + 1);
+      else if (e.key === "ArrowLeft") goTo(s.page - 1);
+      else if (/^[a-e]$/i.test(e.key) && pages[s.page].type === "q") { const b = $(`.alt[data-l="${e.key.toUpperCase()}"]`); b && b.click(); }
+    };
+    let tx = null;
+    $("#book").addEventListener("touchstart", (e) => (tx = e.touches[0].clientX), { passive: true });
+    $("#book").addEventListener("touchend", (e) => {
+      if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; tx = null;
+      if (Math.abs(dx) > 70) goTo(s.page + (dx < 0 ? 1 : -1));
+    });
+
+    updateHead(); drawPage();
+  }
+
+  function questionBody(q) {
+    if (q.externa) {
+      return `<div class="externa">
+        <p><span class="pill warn">Enunciado na fonte de correção</span></p>
+        <p>Esta questão não está na base pública que o simulador usa. Abra o enunciado no site <b>${esc(q.externa.fonte)}</b> (caderno azul do ENEM ${q.year}), resolva e marque sua resposta abaixo. Ela conta no tempo, no mapa de questões e no resultado como as demais.</p>
+        <p><a class="btn" href="${esc(q.externa.url)}" target="_blank" rel="noopener">Abrir o enunciado da questão ${q.index} ↗</a></p>
+        <p class="small muted">É preciso estar conectado à internet para ver esse enunciado.</p>
+      </div>`;
+    }
+    const inline = new Set(); const re = /!\[[^\]]*\]\(([^)\s]+)/g; let m;
+    [q.context, q.alternativesIntroduction].forEach((t) => { if (t) while ((m = re.exec(t))) inline.add(m[1]); });
+    const extra = (q.files || []).filter((u) => u && !inline.has(u)).map((u) => `<img data-src="${esc(u)}" alt="Imagem da questão ${q.index}">`).join("");
+    return `<div class="q-text">${md(q.context)}${extra}</div>${q.alternativesIntroduction ? `<div class="q-intro">${md(q.alternativesIntroduction)}</div>` : ""}`;
+  }
+
+  /* ---------- Redação ---------- */
+  function essayHTML(year, s, readonly) {
+    return `<div class="q-meta"><span class="q-num">Redação</span><span class="pill">Texto dissertativo-argumentativo</span></div>
+      <p style="font-family:var(--serif)">Com base em seus conhecimentos construídos ao longo de sua formação, redija um texto dissertativo-argumentativo em modalidade escrita formal da língua portuguesa sobre o tema:</p>
+      <h3 style="font-size:1.25rem">“${esc(D.THEMES[year])}”</h3>
+      <p class="small muted">Apresente proposta de intervenção que respeite os direitos humanos. Selecione, organize e relacione, de forma coerente e coesa, argumentos e fatos para defesa de seu ponto de vista. Máximo de 30 linhas; até 7 linhas a redação recebe nota zero.</p>
+      <input type="text" class="essay-title" id="essayTitle" placeholder="Título (opcional)" value="${esc(s.redacao.titulo)}" ${readonly ? "readonly" : ""}>
+      <div class="essay-wrap"><div class="essay-lines" id="essayLines"></div>
+        <textarea class="essay" id="essay" spellcheck="false" placeholder="Escreva sua redação aqui…" ${readonly ? "readonly" : ""}>${esc(s.redacao.texto)}</textarea></div>
+      <p class="small muted" id="essayCount"></p>`;
+  }
+  function bindEssay(root, s, persist) {
+    const ta = $("#essay", root), lines = $("#essayLines", root), cnt = $("#essayCount", root);
+    const upd = () => {
+      // estima linhas visuais (~78 caracteres por linha manuscrita)
+      const visual = ta.value.split("\n").reduce((n, l) => n + Math.max(1, Math.ceil(l.length / 78)), 0);
+      const n = Math.max(30, visual);
+      lines.textContent = Array.from({ length: n }, (_, i) => i + 1).join("\n");
+      lines.style.height = ta.offsetHeight + "px";
+      const words = (ta.value.match(/\S+/g) || []).length;
+      cnt.innerHTML = `${words} palavras · ≈ ${visual} linhas ${visual > 30 ? '<span class="pill bad">acima de 30 linhas</span>' : visual <= 7 && words ? '<span class="pill warn">até 7 linhas: nota zero</span>' : ""}`;
+    };
+    ta.addEventListener("input", () => { s.redacao.texto = ta.value; persist && persist(); upd(); });
+    ta.addEventListener("scroll", () => (lines.scrollTop = ta.scrollTop));
+    const ti = $("#essayTitle", root); ti && ti.addEventListener("input", () => { s.redacao.titulo = ti.value; persist && persist(); });
+    new ResizeObserver(upd).observe(ta);
+    upd();
+  }
+
+  /* ---------- Resultado ---------- */
+  function computeResult(qs, s) {
+    const areas = {};
+    qs.forEach((q) => {
+      const a = areas[q.discipline] || (areas[q.discipline] = { acertos: 0, erros: 0, brancos: 0, total: 0 });
+      const ans = s.answers[qKey(q)]; a.total++;
+      if (!ans) a.brancos++; else if (ans === q.correctAlternative) a.acertos++; else a.erros++;
+    });
+    return { areas, acertos: Object.values(areas).reduce((n, a) => n + a.acertos, 0), total: qs.length };
+  }
+
+  function renderResults(box, year, day) {
+    const s = getSess(year, day);
+    const qs = questionsFor(year, day, s.lang);
+    const r = s.result || computeResult(qs, s);
+    const areaCards = Object.entries(r.areas).map(([k, a]) => `
+      <div class="area-res" style="--c:${D.AREAS[k].cor}">
+        <div class="small muted">${D.AREAS[k].nome}</div>
+        <div class="big">${a.acertos}<span class="muted" style="font-size:1rem"> / ${a.total}</span></div>
+        <div class="progress"><i style="width:${100 * a.acertos / a.total}%;background:${D.AREAS[k].cor}"></i></div>
+        <div class="small muted" style="margin-top:6px">${a.erros} erros · ${a.brancos} em branco · ${Math.round(100 * a.acertos / a.total)}% de acerto</div>
+      </div>`).join("");
+
+    box.innerHTML = `
+      <div class="card">
+        <div class="row"><h2>Resultado do ${D.DAYS[day].titulo}</h2><span class="spacer"></span>
+          <span class="pill">Tempo usado: ${fmtTime(s.elapsed)}</span></div>
+        <p class="muted small">Contagem de acertos pelo gabarito oficial. A nota oficial do ENEM usa a Teoria de Resposta ao Item, que não pode ser reproduzida aqui com exatidão.</p>
+        <div class="area-results">${areaCards}</div>
+        <div class="row" style="margin-top:16px">
+          <button class="btn primary" id="reviewBtn">Revisar questões</button>
+          <button class="btn" id="redoBtn">Refazer este dia</button>
+        </div>
+      </div>
+      ${D.DAYS[day].redacao ? `<div class="card" id="essayCard"></div>` : ""}
+      <div id="reviewBox"></div>`;
+
+    $("#redoBtn").onclick = () => {
+      if (!confirm("Apagar as respostas deste dia e recomeçar?")) return;
+      localStorage.removeItem(sessKey(year, day)); renderDay(year, day);
+    };
+    $("#reviewBtn").onclick = () => renderReview($("#reviewBox"), year, day, qs, s, 0);
+    if (D.DAYS[day].redacao) renderEssayResult($("#essayCard"), year, day, s);
+  }
+
+  function renderEssayResult(card, year, day, s) {
+    const av = s.redacaoAval;
+    const texto = (s.redacao.texto || "").trim();
+    card.innerHTML = `<div class="row"><h2>Redação</h2><span class="spacer"></span>
+        <button class="btn gold" id="aiEssay" ${texto ? "" : "disabled"}>${av ? "Corrigir novamente com IA" : "Corrigir com IA"}</button></div>
+      <p class="muted small">Tema: “${esc(D.THEMES[year])}”</p>
+      ${!texto ? '<p class="muted">A redação ficou em branco.</p>' : ""}
+      <div id="essayAval">${av ? avalHTML(av) : ""}</div>
+      <details style="margin-top:12px"><summary>Ver o texto enviado</summary><div class="q-text" style="margin-top:10px">${s.redacao.titulo ? `<p><strong>${esc(s.redacao.titulo)}</strong></p>` : ""}${md(texto)}</div></details>`;
+    $("#aiEssay").onclick = async () => {
+      const b = $("#aiEssay"); b.disabled = true; b.innerHTML = '<span class="spinner"></span> Corrigindo…';
+      try {
+        const res = await AI.corrigirRedacao({ tema: D.THEMES[year], texto: (s.redacao.titulo ? s.redacao.titulo + "\n\n" : "") + texto, ano: year });
+        s.redacaoAval = res; setSess(year, day, s);
+        renderEssayResult(card, year, day, s);
+      } catch (e) {
+        b.disabled = false; b.textContent = "Tentar novamente";
+        $("#essayAval").innerHTML = `<div class="ai-box">${esc(e.message)}\n\nVerifique a conexão ou informe outra chave/modelo em Início › Configurações.</div>`;
+      }
+    };
+  }
+  function avalHTML(av) {
+    return `<div class="row" style="align-items:flex-end;margin:10px 0 16px"><div class="score-total">${av.total}</div><div class="muted">de 1000 pontos</div></div>
+      ${av.anulada ? `<div class="ai-box"><b>Redação anulada.</b> ${esc(av.motivoAnulacao)}</div>` : ""}
+      ${av.competencias.map((c) => `<div class="comp-score">
+        <h4><span>${c.nome}</span><span>${c.nota} / 200</span></h4>
+        <div class="small muted">${esc(c.desc)}</div>
+        <div class="bar"><i style="width:${c.nota / 2}%"></i></div>
+        ${c.nivel ? `<p class="small"><b>Nível de desempenho:</b> ${esc(c.nivel)}</p>` : ""}
+        <p>${esc(c.justificativa)}</p>
+        ${c.comoMelhorar ? `<p class="small"><b>Como melhorar:</b> ${esc(c.comoMelhorar)}</p>` : ""}
+      </div>`).join("")}
+      ${av.parecerGeral ? `<h3>Parecer geral</h3><p style="font-family:var(--serif)">${esc(av.parecerGeral)}</p>` : ""}
+      <div class="grid">
+        ${av.pontosFortes.length ? `<div><h3>Pontos fortes</h3><ul>${av.pontosFortes.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
+        ${av.pontosAMelhorar.length ? `<div><h3>Pontos a melhorar</h3><ul>${av.pontosAMelhorar.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
+      </div>
+      <p class="small muted">Correção gerada por inteligência artificial em ${new Date(av.corrigidaEm).toLocaleString("pt-BR")}. É uma estimativa e não substitui a correção oficial.</p>`;
+  }
+
+  function renderReview(box, year, day, qs, s, i) {
+    const grid = D.DAYS[day].areas.map((a) => `<div class="qgrid-area">${D.AREAS[a].nome}</div><div class="qgrid">${
+      qs.map((q, j) => q.discipline !== a ? "" : `<button data-j="${j}" class="${!s.answers[qKey(q)] ? "" : s.answers[qKey(q)] === q.correctAlternative ? "ok" : "bad"} ${j === i ? "current" : ""}">${q.index}</button>`).join("")}</div>`).join("");
+    const q = qs[i], k = qKey(q), mine = s.answers[k], area = D.AREAS[q.discipline];
+    box.innerHTML = `<div class="card"><h2>Revisão</h2><p class="small muted">Verde = acerto · vermelho = erro · cinza = em branco</p>${grid}</div>
+      <div class="book"><article class="page turn-in-next" style="--page-color:${area.cor}">
+        <div class="q-meta"><span class="q-num">Questão ${q.index}</span><span class="pill">${area.curto}</span>
+          ${!mine ? '<span class="pill warn">em branco</span>' : mine === q.correctAlternative ? '<span class="pill ok">acertou</span>' : `<span class="pill bad">marcou ${mine}</span>`}
+          <span class="pill ok">gabarito ${q.correctAlternative}</span></div>
+        ${questionBody(q)}
+        <div class="alts">${q.alternatives.map((a) => `<div class="alt ${a.letter === q.correctAlternative ? "correct" : a.letter === mine ? "wrong" : ""}">
+          <span class="letter">${a.letter}</span><span class="alt-body">${a.text ? md(a.text) : ""}${a.file ? `<img data-src="${esc(a.file)}" alt="Alternativa ${a.letter}">` : ""}${!a.text && !a.file ? `Alternativa ${a.letter}` : ""}</span></div>`).join("")}</div>
+        ${q.externa ? `<p class="small muted" style="margin-top:16px">A resolução comentada desta questão está na fonte: <a href="${esc(q.externa.url)}" target="_blank" rel="noopener">${esc(q.externa.fonte)} ↗</a></p>` : `<div class="row" style="margin-top:16px"><button class="btn gold" id="explain">Explicar com IA</button></div>`}
+        <div id="explainBox"></div>
+      </article></div>
+      <div class="pager"><button class="btn" id="rPrev" ${i === 0 ? "disabled" : ""}>← Anterior</button>
+        <span class="small muted">${i + 1} de ${qs.length}</span>
+        <button class="btn primary" id="rNext" ${i === qs.length - 1 ? "disabled" : ""}>Próxima →</button></div>`;
+    hydrateImages(box);
+    const goR = (j) => { renderReview(box, year, day, qs, s, j); box.querySelector(".book").scrollIntoView({ behavior: "smooth" }); };
+    $$("[data-j]", box).forEach((b) => (b.onclick = () => goR(Number(b.dataset.j))));
+    $("#rPrev").onclick = () => goR(i - 1);
+    $("#rNext").onclick = () => goR(i + 1);
+    document.onkeydown = (e) => {
+      if (/textarea|input|select/i.test(document.activeElement.tagName) || !$("#rNext")) return;
+      if (e.key === "ArrowRight" && i < qs.length - 1) goR(i + 1);
+      if (e.key === "ArrowLeft" && i > 0) goR(i - 1);
+    };
+    s.explicacoes = s.explicacoes || {};
+    if (s.explicacoes[k]) $("#explainBox").innerHTML = `<div class="ai-box md">${md(s.explicacoes[k])}</div>`;
+    $("#explain") && ($("#explain").onclick = async () => {
+      const b = $("#explain"); b.disabled = true; b.innerHTML = '<span class="spinner"></span> Pensando…';
+      try {
+        const t = await AI.explicarQuestao({ q, marcada: mine, area: area.nome });
+        s.explicacoes[k] = t; setSess(year, day, s);
+        $("#explainBox").innerHTML = `<div class="ai-box md">${md(t)}</div>`;
+      } catch (e) { $("#explainBox").innerHTML = `<div class="ai-box">${esc(e.message)}</div>`; }
+      b.disabled = false; b.textContent = "Explicar com IA";
+    });
+  }
+
+  /* ---------- Desempenho ---------- */
+  function renderPerformance() {
+    const rows = D.YEARS.map((y) => {
+      const s1 = getSess(y, 1), s2 = getSess(y, 2);
+      const a = (s, k) => s && s.finished && s.result && s.result.areas[k] ? `${s.result.areas[k].acertos}/${s.result.areas[k].total}` : "—";
+      const red = s1 && s1.redacaoAval ? s1.redacaoAval.total : "—";
+      const tot = [s1, s2].filter((s) => s && s.finished && s.result).reduce((n, s) => n + s.result.acertos, 0);
+      return `<tr><td><b>${y}</b></td><td class="num">${a(s1, "linguagens")}</td><td class="num">${a(s1, "ciencias-humanas")}</td>
+        <td class="num">${a(s2, "ciencias-natureza")}</td><td class="num">${a(s2, "matematica")}</td><td class="num">${red}</td><td class="num">${tot || "—"}</td></tr>`;
+    }).join("");
+    const sums = {}; let redSum = 0, redN = 0;
+    D.YEARS.forEach((y) => [1, 2].forEach((d) => {
+      const s = getSess(y, d);
+      if (s && s.finished && s.result) Object.entries(s.result.areas).forEach(([k, a]) => { sums[k] = sums[k] || { ac: 0, t: 0 }; sums[k].ac += a.acertos; sums[k].t += a.total; });
+      if (d === 1 && s && s.redacaoAval) { redSum += s.redacaoAval.total; redN++; }
+    }));
+    const avg = Object.keys(D.AREAS).map((k) => `<div class="area-res" style="--c:${D.AREAS[k].cor}"><div class="small muted">${D.AREAS[k].nome}</div>
+      <div class="big">${sums[k] ? Math.round(100 * sums[k].ac / sums[k].t) + "%" : "—"}</div><div class="small muted">${sums[k] ? `${sums[k].ac} acertos em ${sums[k].t} questões` : "nenhuma prova concluída"}</div></div>`).join("");
+    view.innerHTML = `<div class="card"><h1>Desempenho geral</h1><p class="muted">Percentual de acerto acumulado em todas as provas concluídas.</p>
+      <div class="area-results">${avg}<div class="area-res" style="--c:var(--accent-2)"><div class="small muted">Redação (média)</div><div class="big">${redN ? Math.round(redSum / redN) : "—"}</div><div class="small muted">${redN} redações corrigidas</div></div></div></div>
+      <div class="card" style="overflow-x:auto"><table class="table"><thead><tr><th>Edição</th><th>Linguagens</th><th>Humanas</th><th>Natureza</th><th>Matemática</th><th>Redação</th><th>Acertos</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }
+
+  /* ---------- tema claro/escuro ---------- */
+  const applyTheme = (t) => document.documentElement.setAttribute("data-theme", t);
+  applyTheme(load("sim:tema", matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+  $("#themeToggle").onclick = () => {
+    const t = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    applyTheme(t); save("sim:tema", t);
+  };
+
+  // Garante que o cronômetro conte o tempo real mesmo com a aba fechada (o tempo corre enquanto "runningSince" existir).
+  /* ---------- Login (perfis locais, salvos neste navegador) ---------- */
+  const normUser = (t) => String(t || "").trim().split(/\s+/)[0].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+  const users = () => load("sim:usuarios", {});
+  async function hashSenha(salt, senha) {
+    const data = new TextEncoder().encode(salt + ":" + senha);
+    if (window.crypto && crypto.subtle) {
+      const buf = await crypto.subtle.digest("SHA-256", data);
+      return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+    let h = 2166136261; for (const b of data) { h ^= b; h = Math.imul(h, 16777619) >>> 0; } return "f" + h.toString(16);
+  }
+  const anoValido = (a) => /^\d{4}$/.test(a) && +a >= 1900 && +a <= new Date().getFullYear();
+
+  function entrar(u) {
+    USER = u; save("sim:usuarioAtivo", u);
+    ui = load(`sim:u:${u}:ui`, { tab: "inicio", sub: {} });
+      $("#login").hidden = true;
+    const info = users()[u] || {};
+    $("#userBox").innerHTML = `<span class="small">Olá, <b>${esc(info.nome ? info.nome.split(" ")[0] : u)}</b></span> <button class="btn small ghost" id="logoutBtn">Sair</button>`;
+    $("#logoutBtn").onclick = sair;
+    render();
+  }
+  function sair() {
+    stopTimer(); USER = null; localStorage.removeItem("sim:usuarioAtivo");
+    $("#userBox").innerHTML = ""; view.innerHTML = ""; $("#tabs").innerHTML = "";
+    mostrarLogin("entrar");
+  }
+  function mostrarLogin(modo) {
+    const box = $("#login"); box.hidden = false;
+    const criar = modo === "criar";
+    box.innerHTML = `<div class="login-card card">
+      <div class="brand" style="margin-bottom:14px"><span class="brand-mark">E</span><div><strong>Simulado ENEM</strong><small>${criar ? "Criar conta" : "Entrar"}</small></div></div>
+      <div class="subtabs" style="margin-bottom:16px">
+        <button class="subtab ${!criar ? "active" : ""}" data-m="entrar">Entrar</button>
+        <button class="subtab ${criar ? "active" : ""}" data-m="criar">Criar conta</button>
+      </div>
+      <form id="loginForm" autocomplete="off" novalidate>
+        ${criar ? `<label class="field">Nome completo<input type="text" id="lgNome" required placeholder="Ex.: Maria Souza"></label>
+          <p class="small muted" id="lgPrev" style="margin:6px 0 12px">Seu usuário será o primeiro nome em minúsculas.</p>` :
+          `<label class="field">Usuário (primeiro nome, minúsculo)<input type="text" id="lgUser" required placeholder="ex.: maria" autocapitalize="none"></label>`}
+        <label class="field" style="margin-top:10px">Senha (ano de nascimento, 4 dígitos)<input type="password" id="lgSenha" required inputmode="numeric" maxlength="4" pattern="\\d{4}" placeholder="ex.: 2007"></label>
+        <p class="small" id="lgMsg" style="color:var(--bad);min-height:1.4em;margin:10px 0"></p>
+        <button class="btn primary" type="submit" style="width:100%">${criar ? "Criar conta e entrar" : "Entrar"}</button>
+      </form>
+      <p class="small muted" style="margin-top:14px">O progresso de cada pessoa fica salvo neste navegador, separado por usuário. As provas baixadas são compartilhadas entre os usuários.</p>
+    </div>`;
+    $$("[data-m]", box).forEach((b) => (b.onclick = () => mostrarLogin(b.dataset.m)));
+    const msg = (t) => ($("#lgMsg").textContent = t);
+    if (criar) $("#lgNome").oninput = () => { const u = normUser($("#lgNome").value); $("#lgPrev").innerHTML = u ? `Seu usuário será: <b>${esc(u)}</b>` : "Seu usuário será o primeiro nome em minúsculas."; };
+    $("#loginForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const senha = $("#lgSenha").value.trim();
+      if (!anoValido(senha)) return msg("A senha é o ano de nascimento com 4 dígitos (ex.: 2007).");
+      const all = users();
+      if (criar) {
+        const nome = $("#lgNome").value.trim().replace(/\s+/g, " ");
+        const u = normUser(nome);
+        if (!u) return msg("Digite seu nome.");
+        if (all[u]) return msg(`O usuário "${u}" já existe. Use "Entrar" ou outro nome.`);
+        const salt = Math.random().toString(36).slice(2, 10);
+        all[u] = { nome, salt, hash: await hashSenha(salt, senha), criadoEm: new Date().toISOString() };
+        save("sim:usuarios", all);
+        // progresso salvo antes do login passa para a primeira conta criada
+        if (Object.keys(all).length === 1) {
+          Object.keys(localStorage).filter((k) => k.startsWith("sim:sessao:")).forEach((k) => {
+            localStorage.setItem(`sim:u:${u}:` + k.slice(4), localStorage.getItem(k)); localStorage.removeItem(k);
+          });
+        }
+        entrar(u);
+      } else {
+        const u = normUser($("#lgUser").value);
+        const info = all[u];
+        if (!info || (await hashSenha(info.salt, senha)) !== info.hash) return msg("Usuário ou senha incorretos.");
+        entrar(u);
+      }
+    };
+    setTimeout(() => { const f = $(criar ? "#lgNome" : "#lgUser"); f && f.focus(); }, 50);
+  }
+
+  const ativo = load("sim:usuarioAtivo", null);
+  if (ativo && users()[ativo]) entrar(ativo);
+  else mostrarLogin(Object.keys(users()).length ? "entrar" : "criar");
+})();
+
+</script>
+</body>
+</html>

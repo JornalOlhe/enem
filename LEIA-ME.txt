@@ -1,0 +1,35 @@
+SIMULADO ENEM 2016–2023
+=======================
+
+Como abrir
+(Mais simples: abra só o arquivo simulado-enem.html — ele já contém tudo.)
+1. Descompacte a pasta inteira (index.html, css/ e js/ precisam ficar juntos).
+2. Abra o index.html no Chrome ou no Edge.
+3. Na aba "Início", com internet, clique em "Baixar todas as provas para uso offline".
+   As questões, os gabaritos e as imagens ficam salvos no navegador. Depois disso, a prova funciona sem internet.
+
+Se o navegador bloquear o acesso ao abrir o arquivo direto (raro), rode na pasta:
+   python -m http.server 8000
+e acesse http://localhost:8000
+
+Estrutura
+- 10 abas: Início, ENEM 2016 a ENEM 2023, Desempenho
+- Cada ano tem as sub-abas Dia 1 (Linguagens, Ciências Humanas e Redação) e Dia 2 (Ciências da Natureza e Matemática)
+- 45 questões por área, 6 horas por dia, resumo de tópicos antes de cada prova
+- Para virar a página: botões, setas do teclado ou deslizar o dedo. As teclas A a E marcam a resposta e o botão direito risca uma alternativa.
+- A redação é corrigida pela IA (Gemini) nas Competências 1 a 5, de 0 a 200 cada uma, totalizando até 1000 pontos.
+
+Observações
+- As questões vêm da API pública enem.dev (projeto comunitário). Questões de Inglês/Espanhol que a API entrega sem marcação são completadas pelo repositório público do mesmo projeto. Tudo é baixado no seu navegador.
+- 11 questões não existem nessas fontes (2016: 93 em Inglês; 2018: 62; 2019: 5 em Inglês, 98, 100 e 128; 2020: 144, 168 e 179; 2023: 34 e 174). Elas aparecem no lugar certo da prova com o gabarito oficial e um botão que abre o enunciado na Plataforma Assaad ou na Descomplica (caderno azul). Para ver esses enunciados é preciso internet.
+- A chave de IA está no arquivo js/ai.js. Você pode trocá-la ou mudar o modelo em Início > Configurações.
+- O progresso é salvo automaticamente. O cronômetro continua correndo com a aba fechada; use "Pausar" para interrompê-lo.
+- Para levar as provas a outro computador sem baixar tudo de novo, use "Exportar pacote offline" e "Importar pacote".
+
+Login
+- Na primeira vez, clique em "Criar conta": digite o nome completo e o ano de nascimento.
+- Usuário = primeiro nome em minúsculas, sem acento (ex.: "João Silva" -> joao).
+- Senha = ano de nascimento com 4 dígitos (ex.: 2007).
+- Cada usuário tem seu próprio progresso, resultados, redações corrigidas e desempenho.
+  As provas baixadas são compartilhadas, então só precisam ser baixadas uma vez por navegador.
+- O login fica salvo até clicar em "Sair". Os dados ficam só neste navegador (não vão para a internet).
