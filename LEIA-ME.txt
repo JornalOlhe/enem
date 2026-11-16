@@ -22,9 +22,9 @@ Estrutura
 Observações
 - As questões vêm da API pública enem.dev (projeto comunitário). Questões de Inglês/Espanhol que a API entrega sem marcação são completadas pelo repositório público do mesmo projeto. Tudo é baixado no seu navegador.
 - 11 questões não existem nessas fontes (2016: 93 em Inglês; 2018: 62; 2019: 5 em Inglês, 98, 100 e 128; 2020: 144, 168 e 179; 2023: 34 e 174). Elas aparecem no lugar certo da prova com o gabarito oficial e um botão que abre o enunciado na Plataforma Assaad ou na Descomplica (caderno azul). Para ver esses enunciados é preciso internet.
-- A chave de IA está no arquivo js/ai.js. Você pode trocá-la ou mudar o modelo em Início > Configurações.
+- A chave de IA fica no arquivo js/ai.js (linha DEFAULT_KEY). O modelo é escolhido automaticamente: o melhor modelo gratuito do Gemini e, se faltar cota, os seguintes da lista.
+- A língua estrangeira é sempre Inglês.
 - O progresso é salvo automaticamente. O cronômetro continua correndo com a aba fechada; use "Pausar" para interrompê-lo.
-- Para levar as provas a outro computador sem baixar tudo de novo, use "Exportar pacote offline" e "Importar pacote".
 
 Login
 - Na primeira vez, clique em "Criar conta": digite o nome completo e o ano de nascimento.

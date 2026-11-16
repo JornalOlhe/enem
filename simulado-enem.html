@@ -610,17 +610,12 @@ window.ENEM_DATA = {
 /* Integração com a IA (Google Gemini) para corrigir a redação pelas Competências 1 a 5 e explicar questões. */
 (function () {
   const DEFAULT_KEY = "AQ.Ab8RN6LSV1dS__K_fVNxOEyHe-gLZBzOUG3-G33e93U4w58Utg";
-  const DEFAULT_MODEL = "gemini-flash-lite-latest";
-  const FALLBACK_MODELS = ["gemini-flash-lite-latest", "gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-2.5-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
-
-  function settings() {
-    try { return JSON.parse(localStorage.getItem("sim:config") || "{}"); } catch (e) { return {}; }
-  }
+  const DEFAULT_MODEL = "gemini-flash-latest"; // melhor modelo gratuito; se faltar cota, cai para os seguintes
+  const FALLBACK_MODELS = ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-2.5-flash-lite"];
 
   async function call(prompt, { json = false } = {}) {
-    const cfg = settings();
-    const key = (cfg.apiKey || "").trim() || DEFAULT_KEY;
-    const models = [...new Set([(cfg.model || "").trim() || DEFAULT_MODEL, ...FALLBACK_MODELS])];
+    const key = DEFAULT_KEY;
+    const models = [DEFAULT_MODEL, ...FALLBACK_MODELS.filter((m) => m !== DEFAULT_MODEL)];
     const endpoints = [
       (m) => `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,
       (m) => `https://aiplatform.googleapis.com/v1/publishers/google/models/${m}:generateContent`
@@ -764,8 +759,6 @@ Estruture a resposta em: 1) o que a questão pede; 2) resolução passo a passo;
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
   const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { toast("Não foi possível salvar o progresso no navegador."); } };
-  const cfg = () => load("sim:config", {});
-  const setCfg = (patch) => save("sim:config", Object.assign(cfg(), patch));
   let USER = null; // usuário logado (primeiro nome em minúsculas)
   const sessKey = (y, d) => `sim:u:${USER}:sessao:${y}:${d}`;
   const getSess = (y, d) => load(sessKey(y, d), null);
@@ -889,7 +882,6 @@ Estruture a resposta em: 1) o que a questão pede; 2) resolução passo a passo;
   /* ---------- Início ---------- */
   async function renderHome() {
     await Promise.all(D.YEARS.map(ensureExam)); renderTabs();
-    const c = cfg();
     const ready = D.YEARS.filter((y) => exams[y]).length;
     view.innerHTML = `
       <section class="card hero">
@@ -924,31 +916,9 @@ Estruture a resposta em: 1) o que a questão pede; 2) resolução passo a passo;
             <button class="btn primary" data-open="${y}">Abrir prova</button>
           </div>`;
         }).join("")}
-      </section>
-
-      <section class="card">
-        <h2>Configurações</h2>
-        <div class="grid">
-          <label class="field">Língua estrangeira padrão
-            <select id="cfgLang"><option value="ingles">Inglês</option><option value="espanhol">Espanhol</option></select></label>
-          <label class="field">Modelo de IA
-            <input type="text" id="cfgModel" placeholder="${AI.DEFAULT_MODEL}" value="${esc(c.model || "")}"></label>
-          <label class="field">Chave de API (opcional, substitui a chave embutida)
-            <input type="password" id="cfgKey" placeholder="usando a chave embutida" value="${esc(c.apiKey || "")}"></label>
-        </div>
-        <div class="row" style="margin-top:14px">
-          <button class="btn" id="cfgSave">Salvar configurações</button>
-          <span class="spacer"></span>
-          <button class="btn" id="exportBtn">Exportar pacote offline</button>
-          <label class="btn">Importar pacote<input type="file" id="importFile" accept=".json,application/json" hidden></label>
-          <button class="btn danger" id="resetBtn">Apagar progresso</button>
-        </div>
-        <p class="small muted">O pacote exportado (.json) leva as provas para outro computador ou navegador sem precisar baixar de novo. As imagens são baixadas novamente no primeiro uso online.</p>
       </section>`;
 
-    $("#cfgLang").value = c.lang || "ingles";
     $$("[data-open]").forEach((b) => (b.onclick = () => go(b.dataset.open)));
-    $("#cfgSave").onclick = () => { setCfg({ lang: $("#cfgLang").value, model: $("#cfgModel").value.trim(), apiKey: $("#cfgKey").value.trim() }); toast("Configurações salvas."); };
     $("#dlAll").onclick = async () => {
       const st = $("#dlAllStatus"); $("#dlAll").disabled = true;
       for (const y of D.YEARS) {
@@ -958,26 +928,6 @@ Estruture a resposta em: 1) o que a questão pede; 2) resolução passo a passo;
       }
       st.textContent = "Pronto! Provas salvas para uso offline.";
       renderHome();
-    };
-    $("#exportBtn").onclick = async () => {
-      const pkg = await API.exportAll(D.YEARS);
-      if (!pkg.exams.length) return toast("Nenhuma prova baixada ainda.");
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(new Blob([JSON.stringify(pkg)], { type: "application/json" }));
-      a.download = "simulado-enem-pacote.json"; a.click();
-    };
-    $("#importFile").onchange = async (e) => {
-      const f = e.target.files[0]; if (!f) return;
-      try {
-        const yrs = await API.importJSON(JSON.parse(await f.text()));
-        yrs.forEach((y) => delete exams[y]);
-        toast("Importado: " + yrs.join(", ")); renderHome();
-      } catch (err) { toast("Falha ao importar: " + err.message); }
-    };
-    $("#resetBtn").onclick = () => {
-      if (!confirm("Apagar todas as respostas, cronômetros e correções? As provas baixadas continuam salvas.")) return;
-      Object.keys(localStorage).filter((k) => k.startsWith(`sim:u:${USER}:sessao:`)).forEach((k) => localStorage.removeItem(k));
-      toast("Progresso apagado."); renderHome();
     };
   }
 
@@ -1047,8 +997,8 @@ Estruture a resposta em: 1) o que a questão pede; 2) resolução passo a passo;
 
   function renderBriefing(box, year, day) {
     const langs = langsAvailable(year);
-    const lang = cfg().lang || "ingles";
-    const qs = questionsFor(year, day, langs.includes(lang) ? lang : langs[0]);
+    const lang = "ingles"; // língua estrangeira fixa: Inglês
+    const qs = questionsFor(year, day, lang);
     const counts = D.DAYS[day].areas.map((a) => `${D.AREAS[a].curto}: ${qs.filter((q) => q.discipline === a).length} questões`).join(" · ");
     const faltam = 90 - qs.length;
     box.innerHTML = `<div class="card">${briefingHTML(year, day)}</div>
@@ -1056,15 +1006,14 @@ Estruture a resposta em: 1) o que a questão pede; 2) resolução passo a passo;
         <h2>Pronto para começar?</h2>
         <p class="muted">${counts}${D.DAYS[day].redacao ? " · Redação" : ""} · Tempo: 6 horas</p>
         ${faltam > 0 ? `<p class="small"><span class="pill warn">Aviso</span> A base de questões usada pelo simulador não tem ${faltam} ${faltam === 1 ? "questão" : "questões"} deste dia. ${faltam === 1 ? "Ela fica" : "Elas ficam"} de fora da prova e da contagem de acertos.</p>` : ""}
-        ${day === 1 && langs.length ? `<label class="field" style="max-width:260px;margin-bottom:14px">Língua estrangeira
-          <select id="langSel">${langs.map((l) => `<option value="${l}" ${l === lang ? "selected" : ""}>${l === "ingles" ? "Inglês" : l === "espanhol" ? "Espanhol" : l}</option>`).join("")}</select></label>` : ""}
+        ${day === 1 ? `<p class="small muted">Língua estrangeira: <b>Inglês</b>.</p>` : ""}
         <div class="row">
           <button class="btn primary" id="startBtn">Iniciar prova · 6:00:00</button>
           <button class="btn ghost" id="redlBtn">Baixar novamente</button>
         </div>
       </div>`;
     $("#startBtn").onclick = () => {
-      const l = $("#langSel") ? $("#langSel").value : lang;
+      const l = lang;
       setSess(year, day, { started: true, lang: l, elapsed: 0, runningSince: Date.now(), answers: {}, struck: {}, marked: [], page: 0, redacao: { titulo: "", texto: "" }, finished: false });
       renderDay(year, day);
     };
@@ -1324,7 +1273,7 @@ Estruture a resposta em: 1) o que a questão pede; 2) resolução passo a passo;
         renderEssayResult(card, year, day, s);
       } catch (e) {
         b.disabled = false; b.textContent = "Tentar novamente";
-        $("#essayAval").innerHTML = `<div class="ai-box">${esc(e.message)}\n\nVerifique a conexão ou informe outra chave/modelo em Início › Configurações.</div>`;
+        $("#essayAval").innerHTML = `<div class="ai-box">${esc(e.message)}\n\nVerifique a conexão com a internet e tente de novo.</div>`;
       }
     };
   }

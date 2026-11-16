@@ -1,17 +1,12 @@
 /* Integração com a IA (Google Gemini) para corrigir a redação pelas Competências 1 a 5 e explicar questões. */
 (function () {
   const DEFAULT_KEY = "AQ.Ab8RN6LSV1dS__K_fVNxOEyHe-gLZBzOUG3-G33e93U4w58Utg";
-  const DEFAULT_MODEL = "gemini-flash-lite-latest";
-  const FALLBACK_MODELS = ["gemini-flash-lite-latest", "gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-2.5-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
-
-  function settings() {
-    try { return JSON.parse(localStorage.getItem("sim:config") || "{}"); } catch (e) { return {}; }
-  }
+  const DEFAULT_MODEL = "gemini-flash-latest"; // melhor modelo gratuito; se faltar cota, cai para os seguintes
+  const FALLBACK_MODELS = ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-2.5-flash-lite"];
 
   async function call(prompt, { json = false } = {}) {
-    const cfg = settings();
-    const key = (cfg.apiKey || "").trim() || DEFAULT_KEY;
-    const models = [...new Set([(cfg.model || "").trim() || DEFAULT_MODEL, ...FALLBACK_MODELS])];
+    const key = DEFAULT_KEY;
+    const models = [DEFAULT_MODEL, ...FALLBACK_MODELS.filter((m) => m !== DEFAULT_MODEL)];
     const endpoints = [
       (m) => `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,
       (m) => `https://aiplatform.googleapis.com/v1/publishers/google/models/${m}:generateContent`
