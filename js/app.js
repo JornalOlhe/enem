@@ -106,6 +106,7 @@
       .filter((q) => { if (seen.has(q.index)) return false; seen.add(q.index); return true; })
       .sort((a, b) => areas.indexOf(a.discipline) - areas.indexOf(b.discipline) || a.index - b.index);
   }
+  const faltandoDe = (y) => (exams[y] ? API.missingOf(y, exams[y].questions) : []);
   const qKey = (q) => q.index + "|" + (q.language || "");
   function langsAvailable(year) {
     const e = exams[year]; if (!e) return [];
@@ -114,7 +115,7 @@
 
   /* ---------- abas ---------- */
   function renderTabs() {
-    const tabs = [{ id: "inicio", label: "Início" }, ...D.YEARS.map((y) => ({ id: String(y), label: "ENEM " + y, year: y })), { id: "desempenho", label: "Desempenho" }];
+    const tabs = [{ id: "inicio", label: "Início" }, ...D.YEARS.map((y) => ({ id: String(y), label: "ENEM " + y, year: y })), { id: "semanal", label: "Progresso semanal" }, { id: "materias", label: "Matérias" }, { id: "desempenho", label: "Desempenho" }];
     $("#tabs").innerHTML = tabs.map((t) => {
       const dot = t.year ? `<span class="dot ${exams[t.year] ? "ready" : ""}"></span>` : "";
       return `<button class="tab ${ui.tab === t.id ? "active" : ""}" role="tab" data-tab="${t.id}">${t.label}${dot}</button>`;
@@ -122,13 +123,17 @@
     $$(".tab").forEach((b) => (b.onclick = () => go(b.dataset.tab)));
   }
   function go(tab) {
-    ui.tab = tab; saveUI(); stopTimer(); render();
+    ui.tab = tab; saveUI(); stopTimer(); window.SimEstudo && SimEstudo.stopTimers(); render();
     window.scrollTo({ top: 0 });
   }
   async function render() {
     renderTabs();
     if (ui.tab === "inicio") return renderHome();
     if (ui.tab === "desempenho") return renderPerformance();
+    if (ui.tab === "semanal" || ui.tab === "materias") {
+      await Promise.all(D.YEARS.map(ensureExam)); renderTabs();
+      return ui.tab === "semanal" ? SimEstudo.renderSemanal(view) : SimEstudo.renderMaterias(view);
+    }
     const y = Number(ui.tab);
     await ensureExam(y); renderTabs();
     return renderYear(y);
@@ -143,7 +148,7 @@
         <h1>Simulado ENEM 2016 – 2023</h1>
         <p>Oito provas completas, com as 180 questões oficiais de cada edição (45 por área), divididas em Dia 1 e Dia 2, cronômetro de 6 horas por dia, correção automática do gabarito e correção da redação por inteligência artificial nas cinco competências.</p>
         <div class="row" style="margin-top:14px">
-          <button class="btn gold" id="dlAll">${ready === D.YEARS.length ? "Atualizar todas as provas" : "Baixar todas as provas para uso offline"}</button>
+          <button class="btn gold" id="dlAll">${ready === D.YEARS.length && !D.YEARS.some((y) => faltandoDe(y).length) ? "Atualizar todas as provas" : "Baixar / completar todas as provas"}</button>
           <span class="small">${ready}/${D.YEARS.length} provas salvas neste navegador</span>
         </div>
         <div id="dlAllStatus" class="small" style="margin-top:10px"></div>
@@ -165,7 +170,7 @@
           const s1 = getSess(y, 1), s2 = getSess(y, 2);
           const st = (s) => !s ? "" : s.finished ? '<span class="pill ok">concluído</span>' : '<span class="pill warn">em andamento</span>';
           return `<div class="card year-card">
-            <div class="row"><h3>${y}</h3><span class="spacer"></span>${exams[y] ? '<span class="pill ok">offline</span>' : '<span class="pill">não baixada</span>'}</div>
+            <div class="row"><h3>${y}</h3><span class="spacer"></span>${!exams[y] ? '<span class="pill">não baixada</span>' : faltandoDe(y).length ? '<span class="pill warn">incompleta</span>' : '<span class="pill ok">offline</span>'}</div>
             <div class="theme">Redação: “${esc(D.THEMES[y])}”</div>
             <div class="small" style="margin:8px 0">Dia 1 ${st(s1) || "—"} &nbsp; Dia 2 ${st(s2) || "—"}</div>
             <button class="btn primary" data-open="${y}">Abrir prova</button>
@@ -178,10 +183,16 @@
       const st = $("#dlAllStatus"); $("#dlAll").disabled = true;
       for (const y of D.YEARS) {
         try {
-          await download(y, (p) => { st.innerHTML = `<span class="spinner"></span> ENEM ${y}: ${p.fase === "questoes" ? "questões" : "imagens"} ${p.feito}/${p.total}`; });
+          await download(y, (p) => { st.innerHTML = `<span class="spinner"></span> ENEM ${y}: ${p.fase === "questoes" ? "questões" : p.fase === "conferindo" ? "conferindo faltantes" : "imagens"} ${p.feito}/${p.total}`; });
         } catch (e) { st.textContent = `ENEM ${y}: falhou (${e.message}). Continuando…`; }
       }
-      st.textContent = "Pronto! Provas salvas para uso offline.";
+      for (const y of D.YEARS) {
+        if (exams[y] && faltandoDe(y).length) {
+          try { await download(y, (p) => { st.innerHTML = `<span class="spinner"></span> ENEM ${y}: completando (${p.feito}/${p.total})`; }); } catch (e) {}
+        }
+      }
+      const inc = D.YEARS.filter((y) => !exams[y] || faltandoDe(y).length);
+      st.textContent = inc.length ? `Atenção: ${inc.join(", ")} ainda incompleta(s). Clique no botão de novo para completar.` : "Pronto! Todas as provas completas e salvas para uso offline.";
       renderHome();
     };
   }
@@ -226,7 +237,7 @@
       try {
         await download(year, (p) => {
           $("#dlBar") && ($("#dlBar").style.width = (100 * p.feito / Math.max(1, p.total)) + "%");
-          $("#dlTxt") && ($("#dlTxt").textContent = p.fase === "questoes" ? `Questões: ${p.feito} de ${p.total}` : `Imagens: ${p.feito} de ${p.total}${p.falhas ? ` (${p.falhas} ficarão só online)` : ""}`);
+          $("#dlTxt") && ($("#dlTxt").textContent = p.fase === "questoes" ? `Questões: ${p.feito} de ${p.total}` : p.fase === "conferindo" ? `Conferindo questões que faltaram: ${p.feito} de ${p.total}` : `Imagens: ${p.feito} de ${p.total}${p.falhas ? ` (${p.falhas} ficarão só online)` : ""}`);
         });
         toast(`ENEM ${year} salvo para uso offline.`);
         renderYear(year);
@@ -256,11 +267,14 @@
     const qs = questionsFor(year, day, lang);
     const counts = D.DAYS[day].areas.map((a) => `${D.AREAS[a].curto}: ${qs.filter((q) => q.discipline === a).length} questões`).join(" · ");
     const faltam = 90 - qs.length;
+    const incomp = faltandoDe(year);
     box.innerHTML = `<div class="card">${briefingHTML(year, day)}</div>
       <div class="card">
         <h2>Pronto para começar?</h2>
         <p class="muted">${counts}${D.DAYS[day].redacao ? " · Redação" : ""} · Tempo: 6 horas</p>
-        ${faltam > 0 ? `<p class="small"><span class="pill warn">Aviso</span> A base de questões usada pelo simulador não tem ${faltam} ${faltam === 1 ? "questão" : "questões"} deste dia. ${faltam === 1 ? "Ela fica" : "Elas ficam"} de fora da prova e da contagem de acertos.</p>` : ""}
+        ${incomp.length ? `<div class="externa"><p><span class="pill warn">Download incompleto</span> Faltaram ${incomp.length} ${incomp.length === 1 ? "questão" : "questões"} desta prova (${incomp.slice(0, 12).join(", ")}${incomp.length > 12 ? "…" : ""}). Conecte-se à internet e complete antes de começar.</p>
+          <button class="btn primary" id="fixDl">Completar download</button> <span class="small muted" id="fixTxt"></span></div>` : ""}
+        ${faltam > 0 && !incomp.length ? `<p class="small"><span class="pill warn">Aviso</span> A base de questões usada pelo simulador não tem ${faltam} ${faltam === 1 ? "questão" : "questões"} deste dia. ${faltam === 1 ? "Ela fica" : "Elas ficam"} de fora da prova e da contagem de acertos.</p>` : ""}
         ${day === 1 ? `<p class="small muted">Língua estrangeira: <b>Inglês</b>.</p>` : ""}
         <div class="row">
           <button class="btn primary" id="startBtn">Iniciar prova · 6:00:00</button>
@@ -272,6 +286,15 @@
       setSess(year, day, { started: true, lang: l, elapsed: 0, runningSince: Date.now(), answers: {}, struck: {}, marked: [], page: 0, redacao: { titulo: "", texto: "" }, finished: false });
       renderDay(year, day);
     };
+    $("#fixDl") && ($("#fixDl").onclick = async () => {
+      $("#fixDl").disabled = true;
+      try {
+        await download(year, (p) => { $("#fixTxt") && ($("#fixTxt").textContent = p.fase === "imagens" ? `Imagens: ${p.feito}/${p.total}` : p.fase === "conferindo" ? `Buscando faltantes: ${p.feito}/${p.total}` : `Questões: ${p.feito}/${p.total}`); });
+        const rest = faltandoDe(year).length;
+        toast(rest ? `Ainda faltam ${rest} questões. Tente de novo em alguns minutos.` : `ENEM ${year} completo!`);
+      } catch (e) { toast("Não foi possível completar: " + e.message); }
+      renderYear(year);
+    });
     $("#redlBtn").onclick = async () => { await API.delExam(year); delete exams[year]; render(); };
   }
 
@@ -624,6 +647,12 @@
   };
 
   // Garante que o cronômetro conte o tempo real mesmo com a aba fechada (o tempo corre enquanto "runningSince" existir).
+  /* ---------- helpers compartilhados com js/estudo.js ---------- */
+  window.SimApp = {
+    esc, md, load, save, toast, modal, closeModal, hydrateImages, questionBody, questionsFor, go,
+    fmtTime, exams, getUser: () => USER, getTab: () => ui.tab
+  };
+
   /* ---------- Login (perfis locais, salvos neste navegador) ---------- */
   const normUser = (t) => String(t || "").trim().split(/\s+/)[0].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
   const users = () => load("sim:usuarios", {});

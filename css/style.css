@@ -211,3 +211,7 @@ table.table { width: 100%; border-collapse: collapse; font-size: .92rem; }
 .login-card .subtabs { display: flex; }
 .login-card .subtab { flex: 1; text-align: center; }
 .login-card input { width: 100%; }
+.table.materias .bar { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; margin-top: 6px; max-width: 320px; }
+.table.materias .bar i { display: block; height: 100%; }
+.table.materias tr.top td { background: color-mix(in srgb, var(--accent-2) 8%, transparent); }
+.modal-card .page, .modal-card .alts { margin-top: 10px; }

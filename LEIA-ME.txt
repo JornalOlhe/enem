@@ -33,3 +33,19 @@ Login
 - Cada usuário tem seu próprio progresso, resultados, redações corrigidas e desempenho.
   As provas baixadas são compartilhadas, então só precisam ser baixadas uma vez por navegador.
 - O login fica salvo até clicar em "Sair". Os dados ficam só neste navegador (não vão para a internet).
+
+Download das provas
+- Se a internet ou a API falharem no meio, o simulador tenta de novo sozinho e depois busca uma por uma as questões que faltaram.
+- Prova que não terminou de baixar aparece como "incompleta" no Início e mostra o botão "Completar download" antes de começar.
+- O botão "Baixar / completar todas as provas" também completa as que ficaram faltando.
+
+Matérias (aba "Matérias")
+- Mostra, para cada área, os assuntos que mais caíram de 2016 a 2023, com a quantidade por ano. Os 3 primeiros (★) são o principal para estudar.
+- Funciona sem IA (classificação automática por palavras-chave). O botão "Analisar com IA" faz a IA ler as questões e refinar a matéria e o assunto de cada uma; o progresso fica salvo.
+
+Progresso semanal (aba "Progresso semanal")
+- Cada usuário tem um banco de 1000 questões (250 de cada área) sorteadas das provas de 2016 a 2023.
+- Exame da semana: 40 questões, 10 de cada área, em revezamento (Linguagens, Humanas, Matemática, Natureza...).
+- Acertou: a questão sai do banco. Errou ou deixou em branco: ela continua no banco e volta com prioridade.
+- Depois do exame semanal dá para fazer treinos extras de 40 questões.
+- Relatório "O que falta estudar": prioridade = quanto o assunto cai no ENEM × quanto você ainda erra. Mostra também pontos fortes, histórico e o botão "Gerar plano de estudo com IA".

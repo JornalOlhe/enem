@@ -116,6 +116,61 @@ window.ENEM_DATA = {
     { ano: 2023, n: 174, area: "matematica",        lingua: null,     gab: "E", fonte: "Plataforma Assaad", url: "https://plataformaassaad.com.br/questao-174-caderno-azul-do-enem-2023/" }
   ],
 
+  /* Classificação por palavras-chave (funciona sem IA). Cada assunto: [matéria, assunto, padrão].
+     O texto é comparado em minúsculas e sem acentos. A IA, quando disponível, refina esse resultado. */
+  TOPIC_RULES: {
+    "matematica": [
+      ["Matemática", "Matemática financeira", "juros|parcela|financiamento|montante|prestac|emprestimo|aplicacao financeira"],
+      ["Matemática", "Porcentagem", "porcent|%|desconto|aumento de|reajuste"],
+      ["Matemática", "Estatística", "media|mediana|moda|desvio padrao|grafico|tabela|frequencia|pesquisa"],
+      ["Matemática", "Probabilidade", "probabilidade|chance|sorteio|sortead|aleatori"],
+      ["Matemática", "Análise combinatória", "combinac|arranjo|permutac|de quantas maneiras|maneiras distintas|modos distintos|possibilidades"],
+      ["Matemática", "Geometria espacial", "volume|cilindro|cone|esfera|prisma|piramide|cubo|paralelepipedo|capacidade"],
+      ["Matemática", "Geometria plana", "area|triangulo|circulo|circunferencia|perimetro|retangulo|quadrado|angulo|poligono|losango|trapezio"],
+      ["Matemática", "Escalas e unidades de medida", "escala|km|quilometro|metro|centimetro|litro|unidade de medida|conversao"],
+      ["Matemática", "Funções", "funcao|f\\(x\\)|exponencial|logaritm|quadratic|afim|parabola|grafico da"],
+      ["Matemática", "Razão e proporção", "razao|proporc|regra de tres|grandeza|diretamente|inversamente"],
+      ["Matemática", "Trigonometria", "seno|cosseno|tangente|trigonometr"],
+      ["Matemática", "Progressões e sequências", "progressao|sequencia|termo geral|a cada (dia|mes|ano)"]
+    ],
+    "ciencias-natureza": [
+      ["Biologia", "Ecologia e meio ambiente", "ecossistema|cadeia alimentar|teia alimentar|bioma|populac|especie|ambiental|poluic|desmatamento|biodiversidade"],
+      ["Biologia", "Genética e biotecnologia", "gene|genetic|dna|rna|heranca|alelo|cromossom|mutac|transgen|clonagem"],
+      ["Biologia", "Fisiologia humana e saúde", "hormon|sangue|orgao|digest|respirac|imun|vacina|anticorpo|doenca|virus|bacteria|parasit|sistema nervoso"],
+      ["Biologia", "Citologia", "celula|celular|mitocondria|membrana|organela|mitose|meiose"],
+      ["Biologia", "Evolução", "evoluc|selecao natural|adaptac|darwin|lamarck"],
+      ["Biologia", "Botânica", "planta|vegetal|fotossintes|folha|raiz|semente|flor"],
+      ["Química", "Química orgânica", "carbono|hidrocarboneto|organic|ester|alcool|polimero|cadeia carbonica|isomer"],
+      ["Química", "Estequiometria e soluções", "mol|concentrac|soluc|massa molar|g/l|diluic|estequiometr"],
+      ["Química", "Eletroquímica", "pilha|eletrolise|oxidac|reduc|eletrodo|bateria"],
+      ["Química", "Ácidos, bases e equilíbrio", "\\bph\\b|acido|basic|equilibrio quimico|neutraliz"],
+      ["Química", "Termoquímica e cinética", "entalpia|exoterm|endoterm|combust|velocidade da reacao|catalis"],
+      ["Física", "Eletricidade", "corrente eletrica|tensao|resistor|resistencia|circuito|potencia eletrica|volt|ampere|choque"],
+      ["Física", "Ondulatória e óptica", "onda|frequencia|som|sonor|luz|lente|espelho|refrac|reflex|optic"],
+      ["Física", "Termologia", "temperatura|calor|termic|dilatac|caloria|isolante"],
+      ["Física", "Mecânica e energia", "velocidade|aceleracao|forca|movimento|energia cinetica|energia potencial|trabalho|atrito|pressao|empuxo"]
+    ],
+    "ciencias-humanas": [
+      ["Filosofia", "Filosofia", "filosof|platao|aristoteles|socrates|kant|descartes|nietzsche|hobbes|rousseau|locke|maquiavel|etica|razao pura"],
+      ["Sociologia", "Sociologia", "sociolog|weber|durkheim|marx|movimentos sociais|cidadania|desigualdade|classe social|trabalho assalariado|industria cultural"],
+      ["História", "História do Brasil", "brasil colonia|colonial|imperio|republica|vargas|ditadura|militar|escravid|quilombo|abolic|getulio|estado novo"],
+      ["História", "História geral", "revoluc|guerra mundial|guerra fria|idade media|feudal|grecia|grego|roma|romano|iluminismo|renascimento|absolutismo|colonialismo"],
+      ["Geografia", "Geografia física e ambiental", "clima|relevo|bacia|hidrograf|solo|erosao|bioma|vegetac|chuva|aquifero|placas tectonicas"],
+      ["Geografia", "Geografia humana e economia", "urbaniz|migrac|populac|agricultura|agronegocio|industria|globaliz|cidade|metropole|economia|comercio"],
+      ["Geografia", "Cartografia", "mapa|escala|latitude|longitude|fuso|projecao|cartograf"]
+    ],
+    "linguagens": [
+      ["Língua estrangeira", "Inglês", "__lingua__"],
+      ["Literatura", "Literatura", "poema|poesia|romance|modernismo|romantismo|realismo|barroco|literari|cronica|conto|verso"],
+      ["Língua portuguesa", "Variação linguística", "variac|norma padrao|regionalismo|linguistic|variedade|preconceito linguistico"],
+      ["Língua portuguesa", "Gramática e coesão", "pronome|conectivo|verbo|concordancia|coesao|pontuac|oracao"],
+      ["Artes", "Artes", "arte|pintura|obra de|musica|teatro|artista|escultura|museu|cinema"],
+      ["Educação Física", "Educação Física", "esporte|atividade fisica|exercicio|corpo|jogo|danca|ginastica|atleta"],
+      ["Comunicação", "Tecnologias e mídia", "internet|rede social|digital|tecnologia|midia|virtual|publicidade|propaganda|anuncio"],
+      ["Língua portuguesa", "Interpretação e gêneros textuais", "genero|texto|campanha|cartaz|charge|tirinha|reportagem"]
+    ]
+  },
+
   COMPETENCIAS: [
     { n: 1, nome: "Competência 1", desc: "Demonstrar domínio da modalidade escrita formal da língua portuguesa." },
     { n: 2, nome: "Competência 2", desc: "Compreender a proposta de redação e aplicar conceitos das várias áreas de conhecimento para desenvolver o tema, dentro dos limites estruturais do texto dissertativo-argumentativo em prosa." },

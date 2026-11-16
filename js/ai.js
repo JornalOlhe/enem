@@ -129,5 +129,41 @@ Estruture a resposta em: 1) o que a questão pede; 2) resolução passo a passo;
     return call(prompt);
   }
 
-  window.EnemAI = { corrigirRedacao, explicarQuestao, DEFAULT_MODEL };
+  // Lê um lote de questões e indica a matéria e o assunto de cada uma.
+  async function classificarQuestoes(lote) {
+    const prompt = `Você é um professor especialista no Exame Nacional do Ensino Médio. Para cada questão abaixo, identifique a MATÉRIA (por exemplo: Biologia, Química, Física, História, Geografia, Filosofia, Sociologia, Matemática, Literatura, Língua portuguesa, Artes, Educação Física) e o ASSUNTO principal cobrado.
+Use, sempre que servir, um dos assuntos sugeridos para a área da questão (copie exatamente o texto depois de "›"). Só crie um assunto novo, curto (até 5 palavras), se nenhum sugerido servir.
+
+Responda SOMENTE com um JSON válido: uma lista no formato [{"id": "...", "materia": "...", "assunto": "..."}], com um item para cada questão, na mesma ordem.
+
+Questões:
+${lote.map((q) => `--- id: ${q.id}
+Área: ${q.area}
+Assuntos sugeridos: ${q.assuntosSugeridos.join("; ")}
+Enunciado (resumido): ${q.texto}
+Alternativas: ${q.alternativas}`).join("\n")}`;
+    const txt = await call(prompt, { json: true });
+    const t = txt.trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+    let r;
+    try { r = JSON.parse(t); } catch (e) { const a = t.indexOf("["), b = t.lastIndexOf("]"); r = JSON.parse(t.slice(a, b + 1)); }
+    if (!Array.isArray(r)) r = r.questoes || r.itens || [];
+    return r;
+  }
+
+  // Escreve um plano de estudo semanal a partir do relatório de desempenho.
+  async function planoDeEstudo(resumo) {
+    const prompt = `Você é um orientador de estudos para o Exame Nacional do Ensino Médio. Com base no relatório abaixo (em JSON), escreva em português, de forma direta e motivadora, um plano de estudo para os próximos 7 dias.
+
+Regras:
+- Comece com um parágrafo curto de diagnóstico (o que vai bem e o que precisa de atenção).
+- Depois, liste os dias da semana (Segunda a Domingo), cada um com 1 ou 2 assuntos da lista de prioridades, o que revisar e um tipo de exercício. Priorize os assuntos de maior peso no Enem e menor acerto.
+- Reserve um dia para redação (estrutura e proposta de intervenção) e um para revisão geral.
+- Termine com 3 dicas práticas. Use listas com "-" e títulos curtos com "###". No máximo 350 palavras.
+
+Relatório:
+${JSON.stringify(resumo)}`;
+    return call(prompt);
+  }
+
+  window.EnemAI = { corrigirRedacao, explicarQuestao, classificarQuestoes, planoDeEstudo, DEFAULT_MODEL };
 })();

@@ -43,12 +43,20 @@
     const wait = Math.max(0, lastCall + 1150 - Date.now());
     if (wait) await sleep(wait);
     lastCall = Date.now();
-    const res = await fetch(API + path, { headers: { Accept: "application/json" } });
-    if (res.status === 429 && tries < 6) {
+    let res;
+    try {
+      res = await fetch(API + path, { headers: { Accept: "application/json" }, cache: "no-store" });
+    } catch (e) {
+      // falha de rede: tenta de novo com espera crescente
+      if (tries < 6) { await sleep(1500 * (tries + 1)); return apiGet(path, tries + 1); }
+      throw new Error("Sem conexão com a API (" + e.message + ")");
+    }
+    if (res.status === 429 && tries < 8) {
       const ra = parseInt(res.headers.get("Retry-After") || "3", 10);
-      await sleep((isNaN(ra) ? 3 : ra) * 1000 + 300);
+      await sleep((isNaN(ra) ? 3 : ra) * 1000 + 500);
       return apiGet(path, tries + 1);
     }
+    if (res.status >= 500 && tries < 6) { await sleep(2000 * (tries + 1)); return apiGet(path, tries + 1); }
     if (!res.ok) {
       let msg = "HTTP " + res.status;
       try { const j = await res.json(); if (j && j.error) msg += " – " + j.error.message; } catch (e) {}
@@ -68,16 +76,20 @@
   }
   const sig = (q) => (q.title || "") + "#" + String(q.context || "").slice(0, 200);
 
-  async function fetchAllQuestions(year, onProgress) {
+  async function fetchAllQuestions(year, onProgress, previous) {
     const out = new Map();
     const untagged = []; // versões sem língua (podem ser Inglês/Espanhol mal marcados)
     const add = (q) => {
+      if (!q || !Array.isArray(q.alternatives) || !q.alternatives.length) return; // ignora resposta corrompida
       if (!q.language) untagged.push(q);
       const k = q.index + "|" + (q.language || "");
       if (!out.has(k) || q.language) out.set(k, q);
     };
-    let limit = 50, offset = 0, total = null, guard = 0;
-    while (guard++ < 40) {
+    // aproveita o que já estava salvo (um download anterior incompleto não é perdido)
+    (previous || []).forEach((q) => out.set(q.index + "|" + (q.language || ""), q));
+
+    let limit = 50, offset = 0, total = null, guard = 0, emptyRetries = 0;
+    while (guard++ < 60) {
       let r;
       try {
         r = await apiGet(`/exams/${year}/questions?limit=${limit}&offset=${offset}`);
@@ -85,11 +97,17 @@
         if ((e.status === 400 || e.status === 422) && limit > 10) { limit = 10; continue; }
         throw e;
       }
-      (r.questions || []).forEach(add);
-      total = r.metadata ? r.metadata.total : null;
-      offset += (r.questions || []).length;
-      onProgress && onProgress({ fase: "questoes", feito: offset, total: total || offset });
-      if (!r.metadata || !r.metadata.hasMore || !(r.questions || []).length) break;
+      const qs = r.questions || [];
+      qs.forEach(add);
+      if (r.metadata && Number.isFinite(r.metadata.total)) total = r.metadata.total;
+      // página vazia antes do fim: repete algumas vezes antes de desistir
+      if (!qs.length && total != null && offset < total && emptyRetries < 4) { emptyRetries++; await sleep(2000 * emptyRetries); continue; }
+      emptyRetries = 0;
+      offset += qs.length;
+      onProgress && onProgress({ fase: "questoes", feito: Math.min(offset, total || offset), total: total || offset });
+      // continua enquanto não chegar ao total informado pela API, mesmo se "hasMore" vier errado
+      if (!qs.length) break;
+      if (total != null ? offset >= total : !(r.metadata && r.metadata.hasMore)) break;
     }
     // Garante as duas línguas estrangeiras. A posição delas muda conforme o ano
     // (em 2016 ficam nas questões 91 a 95), então percorremos a prova inteira com o filtro de língua.
@@ -143,6 +161,23 @@
         if (out.has(idx + "|ingles") && out.has(idx + "|espanhol")) out.delete(idx + "|");
       }
     }
+
+    // Conferência final: busca uma por uma as questões de 1 a 180 que não chegaram.
+    const have = new Set([...out.values()].map((q) => q.index));
+    const missing = [];
+    for (let i = 1; i <= 180; i++) if (!have.has(i)) missing.push(i);
+    const known = new Set((window.ENEM_DATA.FALTANTES || []).filter((f) => f.ano === Number(year) && !f.lingua).map((f) => f.n));
+    const toFetch = missing.filter((i) => !known.has(i));
+    let n = 0;
+    for (const i of toFetch) {
+      n++;
+      onProgress && onProgress({ fase: "conferindo", feito: n, total: toFetch.length });
+      try { add(await apiGet(`/exams/${year}/questions/${i}`)); continue; } catch (e) { /* tenta pela lista */ }
+      try {
+        const r = await apiGet(`/exams/${year}/questions?limit=10&offset=${Math.max(0, i - 6)}`);
+        (r.questions || []).forEach(add);
+      } catch (e) { /* segue: questão realmente ausente da base */ }
+    }
     return [...out.values()].sort((a, b) => a.index - b.index || String(a.language).localeCompare(String(b.language)));
   }
 
@@ -178,10 +213,22 @@
     return { total: urls.length, falhas };
   }
 
+  // Lista os números (1 a 180) que ainda faltam, desconsiderando os que a base pública não tem
+  // e que o simulador completa com link (ENEM_DATA.FALTANTES).
+  function missingOf(year, questions) {
+    const have = new Set(questions.map((q) => q.index));
+    const known = new Set((window.ENEM_DATA.FALTANTES || []).filter((f) => f.ano === Number(year) && !f.lingua).map((f) => f.n));
+    const out = [];
+    for (let i = 1; i <= 180; i++) if (!have.has(i) && !known.has(i)) out.push(i);
+    return out;
+  }
+
   async function downloadYear(year, onProgress) {
-    const questions = await fetchAllQuestions(year, onProgress);
+    const prev = await getExam(year).catch(() => null);
+    const questions = await fetchAllQuestions(year, onProgress, prev && prev.questions);
     if (!questions.length) throw new Error("A API não retornou questões para " + year);
-    const data = { year, source: "api.enem.dev", savedAt: new Date().toISOString(), questions };
+    const faltando = missingOf(year, questions);
+    const data = { year, source: "api.enem.dev", savedAt: new Date().toISOString(), questions, faltando, completa: faltando.length === 0 };
     await putExam(year, data);
     const img = await cacheImages(questions, onProgress);
     data.images = img;
@@ -222,5 +269,5 @@
     return url; // sem cache: usa a imagem online
   }
 
-  window.EnemAPI = { getExam, putExam, delExam, downloadYear, importJSON, exportAll, resolveImage, imageUrlsOf, cacheImages };
+  window.EnemAPI = { getExam, putExam, delExam, downloadYear, missingOf, importJSON, exportAll, resolveImage, imageUrlsOf, cacheImages };
 })();
