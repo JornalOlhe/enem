@@ -381,21 +381,24 @@ window.ENEM_DATA = {
       ["Matemática", "Probabilidade", "probabilidade|chance|sorteio|sortead|aleatori"],
       ["Matemática", "Análise combinatória", "combinac|arranjo|permutac|de quantas maneiras|maneiras distintas|modos distintos|possibilidades"],
       ["Matemática", "Geometria espacial", "volume|cilindro|cone|esfera|prisma|piramide|cubo|paralelepipedo|capacidade"],
-      ["Matemática", "Geometria plana", "area|triangulo|circulo|circunferencia|perimetro|retangulo|quadrado|angulo|poligono|losango|trapezio"],
-      ["Matemática", "Escalas e unidades de medida", "escala|km|quilometro|metro|centimetro|litro|unidade de medida|conversao"],
+      ["Matemática", "Geometria plana", "area|triangulo|circulo|circunferencia|perimetro|retangulo|quadrado|angulo|poligono|losango|trapezio|figura|lado|terreno|planta baixa|simetria|vista"],
+      ["Matemática", "Escalas e unidades de medida", "escala|km|quilometro|metro|centimetro|milimetro|litro|ml|m2|m3|kg|grama|tonelada|unidade de medida|conversao|hora|minuto|segundo"],
       ["Matemática", "Funções", "funcao|f\\(x\\)|exponencial|logaritm|quadratic|afim|parabola|grafico da"],
-      ["Matemática", "Razão e proporção", "razao|proporc|regra de tres|grandeza|diretamente|inversamente"],
+      ["Matemática", "Razão e proporção", "razao|proporc|regra de tres|grandeza|diretamente|inversamente|dobro|metade|triplo|fracao|partes iguais|vezes maior|vezes menor"],
+      ["Matemática", "Aritmética e operações", "valor|custo|preco|reais|r\\$|lucro|gasto|pagar|pagou|troco|economia|salario|orcamento|quantia"],
       ["Matemática", "Trigonometria", "seno|cosseno|tangente|trigonometr"],
       ["Matemática", "Progressões e sequências", "progressao|sequencia|termo geral|a cada (dia|mes|ano)"]
     ],
     "ciencias-natureza": [
-      ["Biologia", "Ecologia e meio ambiente", "ecossistema|cadeia alimentar|teia alimentar|bioma|populac|especie|ambiental|poluic|desmatamento|biodiversidade"],
+      ["Biologia", "Ecologia e meio ambiente", "ecossistema|cadeia alimentar|teia alimentar|bioma|populac|especie|ambiental|poluic|desmatamento|biodiversidade|efeito estufa|aquecimento global|ozonio|residuo|lixo|reciclag|agua potavel|esgoto"],
       ["Biologia", "Genética e biotecnologia", "gene|genetic|dna|rna|heranca|alelo|cromossom|mutac|transgen|clonagem"],
-      ["Biologia", "Fisiologia humana e saúde", "hormon|sangue|orgao|digest|respirac|imun|vacina|anticorpo|doenca|virus|bacteria|parasit|sistema nervoso"],
+      ["Biologia", "Fisiologia humana e saúde", "hormon|sangue|orgao|digest|respirac|imun|vacina|anticorpo|doenca|virus|bacteria|parasit|sistema nervoso|saude|nutri|proteina|enzima|glicose|metabolismo|medicamento|infecc"],
       ["Biologia", "Citologia", "celula|celular|mitocondria|membrana|organela|mitose|meiose"],
       ["Biologia", "Evolução", "evoluc|selecao natural|adaptac|darwin|lamarck"],
       ["Biologia", "Botânica", "planta|vegetal|fotossintes|folha|raiz|semente|flor"],
-      ["Química", "Química orgânica", "carbono|hidrocarboneto|organic|ester|alcool|polimero|cadeia carbonica|isomer"],
+      ["Química", "Química orgânica", "carbono|hidrocarboneto|organic|ester|alcool|polimero|cadeia carbonica|isomer|combustivel|petroleo|biodiesel|plastico"],
+      ["Química", "Química geral e transformações", "substancia|reacao quimica|reacoes|elemento quimico|atomo|molecula|ligac|tabela periodica|composto|mistura|separac|densidade|metal"],
+      ["Física", "Energia nuclear e radioatividade", "radioativ|nuclear|isotopo|meia-vida|radiacao"],
       ["Química", "Estequiometria e soluções", "mol|concentrac|soluc|massa molar|g/l|diluic|estequiometr"],
       ["Química", "Eletroquímica", "pilha|eletrolise|oxidac|reduc|eletrodo|bateria"],
       ["Química", "Ácidos, bases e equilíbrio", "\\bph\\b|acido|basic|equilibrio quimico|neutraliz"],
@@ -403,7 +406,7 @@ window.ENEM_DATA = {
       ["Física", "Eletricidade", "corrente eletrica|tensao|resistor|resistencia|circuito|potencia eletrica|volt|ampere|choque"],
       ["Física", "Ondulatória e óptica", "onda|frequencia|som|sonor|luz|lente|espelho|refrac|reflex|optic"],
       ["Física", "Termologia", "temperatura|calor|termic|dilatac|caloria|isolante"],
-      ["Física", "Mecânica e energia", "velocidade|aceleracao|forca|movimento|energia cinetica|energia potencial|trabalho|atrito|pressao|empuxo"]
+      ["Física", "Mecânica e energia", "velocidade|aceleracao|forca|movimento|energia cinetica|energia potencial|trabalho|atrito|pressao|empuxo|massa|peso|gravidade|queda|colisao|potencia|energia eletrica|usina|motor"]
     ],
     "ciencias-humanas": [
       ["Filosofia", "Filosofia", "filosof|platao|aristoteles|socrates|kant|descartes|nietzsche|hobbes|rousseau|locke|maquiavel|etica|razao pura"],
@@ -924,7 +927,8 @@ ${JSON.stringify(resumo)}`;
 
   /* ---------- classificação de matérias ---------- */
   const iaCache = () => A().load("sim:topicosIA", {});
-  const defaultTopico = { "matematica": ["Matemática", "Interpretação e raciocínio matemático"], "ciencias-natureza": ["Ciências da Natureza", "Interpretação científica"], "ciencias-humanas": ["Ciências Humanas", "Interpretação de fontes e contextos"], "linguagens": ["Língua portuguesa", "Interpretação e gêneros textuais"] };
+  const OUTROS = "Outros assuntos (sem palavra-chave)";
+  const defaultTopico = { "matematica": ["Matemática", OUTROS], "ciencias-natureza": ["Ciências da Natureza", OUTROS], "ciencias-humanas": ["Ciências Humanas", OUTROS], "linguagens": ["Língua portuguesa", "Interpretação e gêneros textuais"] };
   const regexCache = {};
   function topicoPorRegra(q) {
     if (q.externa) return { materia: defaultTopico[q.discipline][0], assunto: "Não classificada (enunciado externo)", fonte: "regra" };
@@ -1014,17 +1018,17 @@ ${JSON.stringify(resumo)}`;
       </div>
       ${AREA_ORDEM.map((area) => {
         const a = est[area]; if (!a) return "";
-        const itens = Object.values(a.assuntos).sort((x, y) => y.n - x.n);
+        const itens = Object.values(a.assuntos).sort((x, y) => (x.assunto === OUTROS) - (y.assunto === OUTROS) || y.n - x.n);
         const max = itens[0] ? itens[0].n : 1;
         return `<div class="card">
           <h2 style="color:${D.AREAS[area].cor}">${D.AREAS[area].nome}</h2>
           <p class="small muted">${a.total} questões analisadas. Os três primeiros assuntos são o principal para estudar.</p>
           <table class="table materias">
             <thead><tr><th>Assunto</th><th>Matéria</th><th>Questões</th><th>% da área</th><th>Por ano</th></tr></thead>
-            <tbody>${itens.map((it, i) => `<tr ${i < 3 ? 'class="top"' : ""}>
-              <td><b>${i < 3 ? "★ " : ""}${A().esc(it.assunto)}</b><div class="bar"><i style="width:${(100 * it.n) / max}%;background:${D.AREAS[area].cor}"></i></div></td>
+            <tbody>${itens.map((it, i) => { const top = i < 3 && it.assunto !== OUTROS; return `<tr ${top ? 'class="top"' : ""}>
+              <td><b>${top ? "★ " : ""}${A().esc(it.assunto)}</b><div class="bar"><i style="width:${(100 * it.n) / max}%;background:${D.AREAS[area].cor}"></i></div></td>
               <td>${A().esc(it.materia)}</td><td class="num">${it.n}</td><td class="num">${pct(it.n, a.total)}%</td>
-              <td class="small muted">${anos.map((y) => `${String(y).slice(2)}:${it.anos[y] || 0}`).join(" ")}</td></tr>`).join("")}</tbody>
+              <td class="small muted">${anos.map((y) => `${String(y).slice(2)}:${it.anos[y] || 0}`).join(" ")}</td></tr>`; }).join("")}</tbody>
           </table>
         </div>`;
       }).join("")}`;
@@ -1118,7 +1122,7 @@ ${JSON.stringify(resumo)}`;
     const mapa = mapaPorId();
     const total = s.banco.length + s.eliminadas.length;
     const fraq = Object.values(fraquezaPorAssunto(s, mapa));
-    const prioridades = fraq.filter((o) => o.noBanco > 0).sort((a, b) => b.prioridade - a.prioridade).slice(0, 12);
+    const prioridades = fraq.filter((o) => o.noBanco > 0 && o.assunto !== OUTROS).sort((a, b) => b.prioridade - a.prioridade).slice(0, 12);
     const fortes = fraq.filter((o) => o.taxa != null && o.acertos + o.erros >= 3 && o.taxa >= 0.8).sort((a, b) => b.taxa - a.taxa).slice(0, 6);
     const hist = s.sessoes.filter((x) => x.fim).slice(-10);
     const areaStat = AREA_ORDEM.map((area) => {

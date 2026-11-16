@@ -37,7 +37,8 @@
 
   /* ---------- classificação de matérias ---------- */
   const iaCache = () => A().load("sim:topicosIA", {});
-  const defaultTopico = { "matematica": ["Matemática", "Interpretação e raciocínio matemático"], "ciencias-natureza": ["Ciências da Natureza", "Interpretação científica"], "ciencias-humanas": ["Ciências Humanas", "Interpretação de fontes e contextos"], "linguagens": ["Língua portuguesa", "Interpretação e gêneros textuais"] };
+  const OUTROS = "Outros assuntos (sem palavra-chave)";
+  const defaultTopico = { "matematica": ["Matemática", OUTROS], "ciencias-natureza": ["Ciências da Natureza", OUTROS], "ciencias-humanas": ["Ciências Humanas", OUTROS], "linguagens": ["Língua portuguesa", "Interpretação e gêneros textuais"] };
   const regexCache = {};
   function topicoPorRegra(q) {
     if (q.externa) return { materia: defaultTopico[q.discipline][0], assunto: "Não classificada (enunciado externo)", fonte: "regra" };
@@ -127,17 +128,17 @@
       </div>
       ${AREA_ORDEM.map((area) => {
         const a = est[area]; if (!a) return "";
-        const itens = Object.values(a.assuntos).sort((x, y) => y.n - x.n);
+        const itens = Object.values(a.assuntos).sort((x, y) => (x.assunto === OUTROS) - (y.assunto === OUTROS) || y.n - x.n);
         const max = itens[0] ? itens[0].n : 1;
         return `<div class="card">
           <h2 style="color:${D.AREAS[area].cor}">${D.AREAS[area].nome}</h2>
           <p class="small muted">${a.total} questões analisadas. Os três primeiros assuntos são o principal para estudar.</p>
           <table class="table materias">
             <thead><tr><th>Assunto</th><th>Matéria</th><th>Questões</th><th>% da área</th><th>Por ano</th></tr></thead>
-            <tbody>${itens.map((it, i) => `<tr ${i < 3 ? 'class="top"' : ""}>
-              <td><b>${i < 3 ? "★ " : ""}${A().esc(it.assunto)}</b><div class="bar"><i style="width:${(100 * it.n) / max}%;background:${D.AREAS[area].cor}"></i></div></td>
+            <tbody>${itens.map((it, i) => { const top = i < 3 && it.assunto !== OUTROS; return `<tr ${top ? 'class="top"' : ""}>
+              <td><b>${top ? "★ " : ""}${A().esc(it.assunto)}</b><div class="bar"><i style="width:${(100 * it.n) / max}%;background:${D.AREAS[area].cor}"></i></div></td>
               <td>${A().esc(it.materia)}</td><td class="num">${it.n}</td><td class="num">${pct(it.n, a.total)}%</td>
-              <td class="small muted">${anos.map((y) => `${String(y).slice(2)}:${it.anos[y] || 0}`).join(" ")}</td></tr>`).join("")}</tbody>
+              <td class="small muted">${anos.map((y) => `${String(y).slice(2)}:${it.anos[y] || 0}`).join(" ")}</td></tr>`; }).join("")}</tbody>
           </table>
         </div>`;
       }).join("")}`;
@@ -231,7 +232,7 @@
     const mapa = mapaPorId();
     const total = s.banco.length + s.eliminadas.length;
     const fraq = Object.values(fraquezaPorAssunto(s, mapa));
-    const prioridades = fraq.filter((o) => o.noBanco > 0).sort((a, b) => b.prioridade - a.prioridade).slice(0, 12);
+    const prioridades = fraq.filter((o) => o.noBanco > 0 && o.assunto !== OUTROS).sort((a, b) => b.prioridade - a.prioridade).slice(0, 12);
     const fortes = fraq.filter((o) => o.taxa != null && o.acertos + o.erros >= 3 && o.taxa >= 0.8).sort((a, b) => b.taxa - a.taxa).slice(0, 6);
     const hist = s.sessoes.filter((x) => x.fim).slice(-10);
     const areaStat = AREA_ORDEM.map((area) => {
