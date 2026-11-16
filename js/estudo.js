@@ -133,13 +133,13 @@
         return `<div class="card">
           <h2 style="color:${D.AREAS[area].cor}">${D.AREAS[area].nome}</h2>
           <p class="small muted">${a.total} questões analisadas. Os três primeiros assuntos são o principal para estudar.</p>
-          <table class="table materias">
+          <div class="tbl-wrap"><table class="table materias">
             <thead><tr><th>Assunto</th><th>Matéria</th><th>Questões</th><th>% da área</th><th>Por ano</th></tr></thead>
             <tbody>${itens.map((it, i) => { const top = i < 3 && it.assunto !== OUTROS; return `<tr ${top ? 'class="top"' : ""}>
               <td><b>${top ? "★ " : ""}${A().esc(it.assunto)}</b><div class="bar"><i style="width:${(100 * it.n) / max}%;background:${D.AREAS[area].cor}"></i></div></td>
               <td>${A().esc(it.materia)}</td><td class="num">${it.n}</td><td class="num">${pct(it.n, a.total)}%</td>
               <td class="small muted">${anos.map((y) => `${String(y).slice(2)}:${it.anos[y] || 0}`).join(" ")}</td></tr>`; }).join("")}</tbody>
-          </table>
+          </table></div>
         </div>`;
       }).join("")}`;
     const btn = $("#iaRefinar", view);
@@ -263,21 +263,21 @@
       <div class="card">
         <h2>O que falta estudar</h2>
         <p class="small muted">Ordem de prioridade = quanto o assunto cai no ENEM × quanto você ainda erra. Assuntos que você ainda não respondeu contam como 50% de acerto.</p>
-        <table class="table"><thead><tr><th>#</th><th>Assunto</th><th>Área</th><th>Peso no ENEM</th><th>Seu acerto</th><th>No banco</th></tr></thead>
+        <div class="tbl-wrap"><table class="table"><thead><tr><th>#</th><th>Assunto</th><th>Área</th><th>Peso no ENEM</th><th>Seu acerto</th><th>No banco</th></tr></thead>
         <tbody>${prioridades.map((o, i) => `<tr><td class="num">${i + 1}</td><td><b>${A().esc(o.assunto)}</b><div class="small muted">${A().esc(o.materia)}</div></td>
           <td><span class="pill" style="color:${D.AREAS[o.area].cor}">${D.AREAS[o.area].curto}</span></td>
           <td class="num">${Math.round(o.peso * 100)}% da área</td>
-          <td class="num">${o.taxa == null ? "—" : Math.round(o.taxa * 100) + "% (" + (o.acertos + o.erros) + ")"}</td><td class="num">${o.noBanco}</td></tr>`).join("")}</tbody></table>
+          <td class="num">${o.taxa == null ? "—" : Math.round(o.taxa * 100) + "% (" + (o.acertos + o.erros) + ")"}</td><td class="num">${o.noBanco}</td></tr>`).join("")}</tbody></table></div>
         ${fortes.length ? `<h3 style="margin-top:18px">Seus pontos fortes</h3><p>${fortes.map((o) => `<span class="pill ok">${A().esc(o.assunto)} · ${Math.round(o.taxa * 100)}%</span>`).join(" ")}</p>` : ""}
         <div class="row" style="margin-top:16px"><button class="btn gold" id="planoIA">${s.plano ? "Atualizar plano de estudo com IA" : "Gerar plano de estudo com IA"}</button></div>
         <div id="planoBox">${s.plano ? `<div class="ai-box md">${A().md(s.plano.texto)}</div><p class="small muted">Plano gerado em ${new Date(s.plano.em).toLocaleString("pt-BR")}.</p>` : ""}</div>
       </div>
       <div class="card">
         <h2>Histórico</h2>
-        ${hist.length ? `<table class="table"><thead><tr><th>Semana</th><th>Tipo</th>${AREA_ORDEM.map((a) => `<th>${D.AREAS[a].curto}</th>`).join("")}<th>Total</th><th></th></tr></thead><tbody>
+        ${hist.length ? `<div class="tbl-wrap"><table class="table"><thead><tr><th>Semana</th><th>Tipo</th>${AREA_ORDEM.map((a) => `<th>${D.AREAS[a].curto}</th>`).join("")}<th>Total</th><th></th></tr></thead><tbody>
           ${hist.slice().reverse().map((h) => `<tr><td>${h.semana}</td><td>${h.tipo === "semanal" ? "Exame da semana" : "Treino extra"}</td>
             ${AREA_ORDEM.map((a) => `<td class="num">${(h.resultado.areas[a] || {}).acertos || 0}/${(h.resultado.areas[a] || {}).total || 0}</td>`).join("")}
-            <td class="num"><b>${h.resultado.acertos}/${h.resultado.total}</b></td><td><button class="btn small" data-rev="${h.id}">Revisar</button></td></tr>`).join("")}</tbody></table>`
+            <td class="num"><b>${h.resultado.acertos}/${h.resultado.total}</b></td><td><button class="btn small" data-rev="${h.id}">Revisar</button></td></tr>`).join("")}</tbody></table></div>`
         : '<p class="muted">Nenhum exame semanal feito ainda.</p>'}
       </div>`;
     const iniciar = (tipo) => { const st = estado(); const ex = montarExame(garantirBanco(st), tipo); st.sessoes.push(ex); salvar(st); renderSemanal(view); };
@@ -375,6 +375,16 @@
       $("#semCont").onclick = A().closeModal;
       $("#semOk").onclick = () => { A().closeModal(); finalizar(); };
     };
+    document.onkeydown = (e) => {
+      if (!$("#semPage") || !$("#modal").hidden || /textarea|input|select/i.test(document.activeElement.tagName)) return;
+      if (e.key === "ArrowRight") goTo(ex.pagina + 1);
+      else if (e.key === "ArrowLeft") goTo(ex.pagina - 1);
+      else if (/^[a-e]$/i.test(e.key)) { const b = $(`#semPage .alt[data-l="${e.key.toUpperCase()}"]`); b && b.click(); }
+    };
+    // deslizar o dedo no celular
+    let tx = null; const book = $(".book", view);
+    book.addEventListener("touchstart", (e) => (tx = e.touches[0].clientX), { passive: true });
+    book.addEventListener("touchend", (e) => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 70) goTo(ex.pagina + (dx < 0 ? 1 : -1)); });
     head(); draw();
   }
 

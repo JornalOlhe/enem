@@ -162,6 +162,7 @@
           <li>Leia o resumo dos tópicos e clique em <b>Iniciar prova</b>. O cronômetro de 6 horas começa e o progresso é salvo automaticamente.</li>
           <li>Vire as páginas com os botões, com as setas ← → do teclado ou deslizando o dedo. Clique com o botão direito numa alternativa para riscá-la.</li>
           <li>Ao finalizar, veja os acertos por área, revise cada questão e peça à IA a correção da redação ou a explicação de uma questão.</li>
+          <li>Na aba <b>Matérias</b>, veja os assuntos que mais caem em cada área. Em <b>Progresso semanal</b>, faça o exame da semana (10 questões de cada área): acertou, a questão sai do seu banco de 1000; errou, ela volta. O relatório mostra o que falta estudar.</li>
         </ol>
       </section>
 

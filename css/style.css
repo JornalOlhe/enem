@@ -215,3 +215,21 @@ table.table { width: 100%; border-collapse: collapse; font-size: .92rem; }
 .table.materias .bar i { display: block; height: 100%; }
 .table.materias tr.top td { background: color-mix(in srgb, var(--accent-2) 8%, transparent); }
 .modal-card .page, .modal-card .alts { margin-top: 10px; }
+.tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.tbl-wrap .table { min-width: 560px; }
+/* modo escuro: destaques com fundo escuro para o texto branco ter contraste */
+[data-theme="dark"] .hero { background: linear-gradient(135deg, #2b3a80, #141a33); }
+[data-theme="dark"] .login { background: linear-gradient(135deg, #2b3a80, #0f1326); }
+[data-theme="dark"] .btn.primary { color: #10142a; }
+/* topo compacto no celular */
+.topbar { flex-wrap: nowrap; gap: 10px; }
+.topbar > .row { flex-wrap: nowrap; }
+@media (max-width: 640px) {
+  .topbar { padding: 10px 12px; }
+  .brand small, #userBox span.small { display: none; }
+  .brand strong { font-size: 1.05rem; white-space: nowrap; }
+  .brand-mark { width: 32px; height: 32px; font-size: 1.1rem; }
+  .theme-toggle { width: 34px; height: 34px; }
+  .tabs { top: 62px; }
+  .exam-head { top: 110px; }
+}
